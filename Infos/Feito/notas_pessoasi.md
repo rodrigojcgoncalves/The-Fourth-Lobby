@@ -1,0 +1,225 @@
+# 1. Criação da base de dados.
+
+
+## Este foi o scrip usado no SQL Editor do supabase para a criação da Base de Dados
+
+
+```
+
+-- 1. EXTENSÕES E TIPOS (ENUMS)
+create extension if not exists "uuid-ossp";
+
+create type user_role as enum ('customer', 'promoter', 'organizer');
+create type event_status as enum ('draft', 'published', 'finished');
+create type order_status as enum ('pending', 'completed', 'failed');
+create type ticket_status as enum ('valid', 'used', 'refunded');
+
+-- 2. TABELAS PRINCIPAIS
+
+-- Tabela de utilizadores (espelho da auth.users do Supabase)
+create table public.users (
+  id uuid references auth.users on delete cascade primary key,
+  email text unique not null,
+  role user_role default 'customer',
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Eventos
+create table public.events (
+  id uuid primary key default uuid_generate_v4(),
+  organizer_id uuid references public.users(id) not null,
+  name text not null,
+  description text,
+  date timestamp with time zone not null,
+  location text,
+  capacity int not null,
+  image_url text,
+  status event_status default 'draft',
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Artistas
+create table public.artists (
+  id uuid primary key default uuid_generate_v4(),
+  event_id uuid references public.events(id) on delete cascade,
+  name text not null,
+  bio text,
+  image_url text,
+  genre text
+);
+
+-- Tipos de Bilhetes / Fases
+create table public.ticket_types (
+  id uuid primary key default uuid_generate_v4(),
+  event_id uuid references public.events(id) on delete cascade,
+  name text not null,
+  price decimal(10,2) not null,
+  total_quantity int not null,
+  sold_quantity int default 0,
+  start_date timestamp with time zone,
+  end_date timestamp with time zone
+);
+
+-- Encomendas (Transações Financeiras)
+create table public.orders (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references public.users(id),
+  total_amount decimal(10,2) not null,
+  stripe_payment_id text,
+  status order_status default 'pending',
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Itens da Encomenda
+create table public.order_items (
+  id uuid primary key default uuid_generate_v4(),
+  order_id uuid references public.orders(id) on delete cascade,
+  ticket_type_id uuid references public.ticket_types(id),
+  quantity int not null
+);
+
+-- Promotores (RPs)
+create table public.promoters (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references public.users(id) unique,
+  referral_code text unique not null,
+  commission_rate decimal(5,2) default 0.00,
+  total_earned decimal(10,2) default 0.00
+);
+
+-- Bilhetes (Ativos individuais)
+create table public.tickets (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references public.users(id),
+  event_id uuid references public.events(id),
+  ticket_type_id uuid references public.ticket_types(id),
+  order_id uuid references public.orders(id),
+  price_paid decimal(10,2),
+  status ticket_status default 'valid',
+  qr_code text unique not null,
+  purchased_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Conversões de Afiliados
+create table public.affiliate_conversions (
+  id uuid primary key default uuid_generate_v4(),
+  promoter_id uuid references public.promoters(id),
+  ticket_id uuid references public.tickets(id),
+  commission_amount decimal(10,2) not null,
+  status text default 'pending' -- pending, paid
+);
+
+-- Despesas Operacionais
+create table public.expenses (
+  id uuid primary key default uuid_generate_v4(),
+  event_id uuid references public.events(id) on delete cascade,
+  description text not null,
+  category text,
+  amount decimal(10,2) not null,
+  date date not null
+);
+
+-- Análise de Sentimento (NLP)
+create table public.sentiment_analyses (
+  id uuid primary key default uuid_generate_v4(),
+  event_id uuid references public.events(id) on delete cascade,
+  platform text,
+  sentiment_score decimal(3,2), -- -1.00 a 1.00
+  collected_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- 3. ÍNDICES PARA PERFORMANCE
+create index idx_events_organizer on public.events(organizer_id);
+create index idx_tickets_user on public.tickets(user_id);
+create index idx_tickets_event on public.tickets(event_id);
+create index idx_orders_user on public.orders(user_id);
+create index idx_promoter_code on public.promoters(referral_code);
+
+-- 4. TRIGGER PARA SINCRONIZAR AUTH.USERS COM PUBLIC.USERS
+-- Este trigger cria automaticamente uma entrada na tabela pública quando alguém faz Sign-up
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.users (id, email, role)
+  values (new.id, new.email, 'customer');
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- 5. ROW LEVEL SECURITY (RLS) POLICIES
+
+-- Ativar RLS em todas as tabelas
+alter table public.users enable row level security;
+alter table public.events enable row level security;
+alter table public.tickets enable row level security;
+alter table public.expenses enable row level security;
+alter table public.promoters enable row level security;
+
+-- Políticas para Eventos
+create policy "Qualquer pessoa vê eventos publicados"
+  on public.events for select
+  using (status = 'published');
+
+create policy "Organizadores gerem os seus próprios eventos"
+  on public.events for all
+  using (auth.uid() = organizer_id);
+
+-- Políticas para Bilhetes
+create policy "Utilizadores vêem os seus próprios bilhetes"
+  on public.tickets for select
+  using (auth.uid() = user_id);
+
+create policy "Organizadores vêem bilhetes dos seus eventos"
+  on public.tickets for select
+  using (
+    exists (
+      select 1 from public.events 
+      where events.id = tickets.event_id 
+      and events.organizer_id = auth.uid()
+    )
+  );
+
+-- Políticas para Despesas (Apenas Organizadores)
+create policy "Apenas organizadores vêem e gerem despesas"
+  on public.expenses for all
+  using (
+    exists (
+      select 1 from public.events 
+      where events.id = expenses.event_id 
+      and events.organizer_id = auth.uid()
+    )
+  );
+--
+Notas de Implementação no Supabase:
+Security Definer: A função handle_new_user usa security definer para que possa escrever na tabela public.users mesmo que o utilizador ainda não tenha permissões (no momento exato do registo).
+
+Stripe: Quando o Stripe confirmar o pagamento, o teu backend deve dar UPDATE na tabela orders para status = 'completed'. Podes criar um trigger no Postgres para gerar as linhas na tabela tickets automaticamente quando uma order for paga.
+
+RLS: As políticas que defini garantem que um utilizador comum nunca veja as despesas de um organizador nem os bilhetes de outras pessoas. Isto é o "ponto de honra" da segurança em aplicações modernas.
+
+```
+
+## 1.1 Algumas políticas de RLS na Supabase
+
+criei 2 buckets 'USER-AVATARS' e 'EVENT-IMAGES'
+
+estes têm algumas policies de RLS por segurança, politicas como:
+- Public Acces: permite que qualquer utilizador, logado ou sem conta, consiga ver as imagens, tais como avatares e cartazes
+- Users can update or delete their own avatar: que restringe que apenas utilizadores logados consigam alterar ou apagar o avatar, esta policie confirma também se o user é o user
+- Only organizers can update or delete images: restringe apenas à role ORGANIZER o ato de alterar ou apagar imagens
+
+## 1.2 Hugging Face
+
+Criei conta na Hugging face, que é um "github" das IA, onde existem vários modelos de IA's disponiveis para serem usados por devs, o meu objetivo é usar um modelo de NLP pronto
+
+criei token com opção de READ e adicionei ao .env 
+
+## 2.   Gestão de Estado com Zustand e a Autenticação
+
+Como as políticas de RLS estão ativas, não conseguirás testar as tabelas de eventos ou bilhetes sem um utilizador autenticado.
+
+npm install zustand

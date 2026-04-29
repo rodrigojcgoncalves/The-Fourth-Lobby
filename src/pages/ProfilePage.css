@@ -1,0 +1,175 @@
+/* Profile Page */
+.profile-page {
+  padding: 2rem 0;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--neon-cyan);
+  object-fit: cover;
+}
+
+.profile-info h1 {
+  margin: 0 0 0.5rem;
+  color: var(--neon-cyan);
+  font-size: 1.75rem;
+}
+
+.role-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin: 0 0 0.5rem;
+}
+
+.email {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.profile-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  background: var(--glass-bg);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+}
+
+.tab {
+  padding: 0.75rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.tab:hover,
+.tab.active {
+  background: var(--neon-cyan);
+  color: #000;
+}
+
+.profile-content {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 2rem;
+}
+
+.profile-form fieldset {
+  border: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.profile-form legend {
+  color: var(--neon-magenta);
+  font-weight: bold;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--input-background);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.history-section {
+  text-align: center;
+  padding: 2rem;
+}
+
+.history-section h2 {
+  color: var(--neon-cyan);
+  margin: 0 0 1rem;
+}
+
+.history-section p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.btn-logout {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--destructive);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.btn-logout:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .profile-tabs {
+    grid-template-columns: 1fr;
+  }
+}

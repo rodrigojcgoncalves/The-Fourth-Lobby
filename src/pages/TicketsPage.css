@@ -1,0 +1,131 @@
+/* Tickets Page */
+.tickets-page {
+  padding: 2rem 0;
+}
+
+.tickets-page h1 {
+  color: var(--neon-cyan);
+  margin: 0 0 2rem;
+  font-size: 2rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  border: 1px dashed var(--glass-border);
+  border-radius: var(--radius);
+  background: var(--glass-bg);
+}
+
+.empty-state p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 1.5rem;
+}
+
+.tickets-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.ticket-item {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  background: var(--glass-bg);
+  transition: all 0.3s ease;
+}
+
+.ticket-item:hover {
+  border-color: var(--neon-cyan);
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.ticket-header h3 {
+  margin: 0;
+  color: var(--neon-cyan);
+  font-size: 1.25rem;
+}
+
+.status {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.status.valid {
+  background: var(--neon-cyan);
+  color: #000;
+}
+
+.status.used {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.status.cancelled {
+  background: var(--destructive);
+  color: #fff;
+}
+
+.ticket-info {
+  margin-bottom: 2rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.info-row .label {
+  color: var(--neon-magenta);
+  font-size: 0.875rem;
+}
+
+.info-row .value {
+  color: #fff;
+  font-weight: 500;
+}
+
+.ticket-qr {
+  display: flex;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: var(--radius);
+}
+
+.ticket-qr img {
+  max-width: 250px;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .tickets-page {
+    padding: 1rem 0;
+  }
+
+  .ticket-item {
+    padding: 1rem;
+  }
+
+  .ticket-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .ticket-qr img {
+    max-width: 150px;
+  }
+}

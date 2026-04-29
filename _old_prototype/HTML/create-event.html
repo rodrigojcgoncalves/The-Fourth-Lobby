@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Evento - The Fourth Lobby</title>
+  <link rel="stylesheet" href="../CSS/styles.css">
+</head>
+<body class="dark">
+  <header>
+    <div class="header-content">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">4L</div>
+        <span class="logo-text">The Fourth Lobby</span>
+      </a>
+      <div style="flex: 1;"></div>
+      <a href="organizer.html" class="nav-link">Dashboard</a>
+      <a href="#logout" class="nav-link" data-nav="logout">Logout</a>
+    </div>
+  </header>
+
+  <main class="dark">
+    <div class="container">
+      <h1 style="margin-bottom: 2rem;">Criar Novo Evento</h1>
+
+      <form id="eventForm" class="event-form">
+        <!-- Basic Info Grid -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-content">
+            <h2 style="margin-bottom: 1.5rem;">Informações Básicas</h2>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="eventTitle">Título do Evento *</label>
+                <input type="text" id="eventTitle" placeholder="DIMENSION V: The Ascension" required />
+              </div>
+
+              <div class="form-group">
+                <label for="eventDate">Data & Hora *</label>
+                <input type="datetime-local" id="eventDate" required />
+              </div>
+
+              <div class="form-group">
+                <label for="eventLocation">Localização *</label>
+                <input type="text" id="eventLocation" placeholder="Warehouse District, Porto" required />
+              </div>
+
+              <div class="form-group">
+                <label for="eventCapacity">Capacidade Máxima *</label>
+                <input type="number" id="eventCapacity" placeholder="500" min="10" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="eventDescription">Descrição do Evento *</label>
+              <textarea id="eventDescription" placeholder="Descreve o teu evento em detalhes..." rows="5" required></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Poster Upload -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-content">
+            <h2 style="margin-bottom: 1.5rem;">Cartaz do Evento</h2>
+
+            <div class="poster-upload">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <p>Arrastra o teu cartaz ou clica para fazer upload</p>
+              <p style="color: var(--muted-foreground); font-size: 0.875rem;">PNG, JPG, até 10MB</p>
+              <input type="file" id="posterInput" accept="image/*" style="display: none;" />
+            </div>
+
+            <div id="posterPreview" style="margin-top: 1rem; display: none;">
+              <p style="margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--muted-foreground);">Pré-visualização:</p>
+              <img id="posterImg" src="" alt="Cartaz" style="max-width: 100%; max-height: 300px; border-radius: var(--radius);" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticket Phases -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-content">
+            <h2 style="margin-bottom: 1.5rem;">Fases de Bilhetes</h2>
+
+            <div class="ticket-phases-editor">
+              <div class="ticket-phase-edit">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+                  <input type="text" placeholder="Early Entry" value="Early Entry" />
+                  <input type="number" placeholder="Preço (€)" value="15" />
+                  <input type="number" placeholder="Quantidade" value="50" />
+                </div>
+              </div>
+
+              <div class="ticket-phase-edit">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+                  <input type="text" placeholder="1ª Fase" value="1ª Fase" />
+                  <input type="number" placeholder="Preço (€)" value="20" />
+                  <input type="number" placeholder="Quantidade" value="100" />
+                </div>
+              </div>
+
+              <div class="ticket-phase-edit">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+                  <input type="text" placeholder="2ª Fase" value="2ª Fase" />
+                  <input type="number" placeholder="Preço (€)" value="25" />
+                  <input type="number" placeholder="Quantidade" value="100" />
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="btn-add-phase" onclick="addTicketPhase()">
+              + Adicionar Fase de Bilhetes
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div style="display: flex; gap: 1rem;">
+          <button type="submit" class="btn-create-event">
+            Criar Evento
+          </button>
+          <a href="organizer.html" class="btn-cancel-event">
+            Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="../JS/data.js"></script>
+  <script src="../JS/app.js"></script>
+  <script>
+    // Poster upload
+    const posterUpload = document.querySelector('.poster-upload');
+    const posterInput = document.getElementById('posterInput');
+    const posterPreview = document.getElementById('posterPreview');
+    const posterImg = document.getElementById('posterImg');
+
+    posterUpload.addEventListener('click', () => posterInput.click());
+
+    posterInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          posterImg.src = event.target.result;
+          posterPreview.style.display = 'block';
+          posterUpload.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Drag and drop for poster
+    posterUpload.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      posterUpload.style.borderColor = 'var(--neon-cyan)';
+      posterUpload.style.background = 'rgba(0, 212, 255, 0.1)';
+    });
+
+    posterUpload.addEventListener('dragleave', () => {
+      posterUpload.style.borderColor = 'var(--glass-border)';
+      posterUpload.style.background = 'transparent';
+    });
+
+    posterUpload.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      posterInput.files = e.dataTransfer.files;
+      posterInput.dispatchEvent(new Event('change'));
+    });
+
+    // Add ticket phase
+    function addTicketPhase() {
+      const editor = document.querySelector('.ticket-phases-editor');
+      const newPhase = document.createElement('div');
+      newPhase.className = 'ticket-phase-edit';
+      newPhase.innerHTML = `
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 50px; gap: 1rem; align-items: end;">
+          <input type="text" placeholder="Nome da Fase" />
+          <input type="number" placeholder="Preço (€)" />
+          <input type="number" placeholder="Quantidade" />
+          <button type="button" onclick="this.parentElement.parentElement.remove()" style="background: rgba(212, 24, 61, 0.2); border: none; border-radius: var(--radius); color: var(--destructive); cursor: pointer; padding: 0.5rem;">
+            ✕
+          </button>
+        </div>
+      `;
+      editor.appendChild(newPhase);
+    }
+
+    // Form submission
+    document.getElementById('eventForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const eventData = {
+        title: document.getElementById('eventTitle').value,
+        date: document.getElementById('eventDate').value,
+        location: document.getElementById('eventLocation').value,
+        capacity: document.getElementById('eventCapacity').value,
+        description: document.getElementById('eventDescription').value,
+        poster: document.getElementById('posterImg').src,
+      };
+
+      console.log('Evento criado:', eventData);
+      alert('Evento criado com sucesso!');
+      window.location.href = 'organizer.html';
+    });
+  </script>
+
+  <style>
+    .event-form {
+      max-width: 800px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    textarea {
+      background: var(--input-background);
+      border: 1px solid var(--border);
+      color: var(--foreground);
+      border-radius: var(--radius);
+      padding: 0.75rem;
+      font-family: var(--font-family);
+      resize: vertical;
+    }
+
+    .poster-upload {
+      border: 2px dashed var(--glass-border);
+      border-radius: var(--radius);
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .poster-upload:hover {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 212, 255, 0.05);
+    }
+
+    .poster-upload svg {
+      color: var(--muted-foreground);
+    }
+
+    .ticket-phases-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .ticket-phase-edit {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+
+    .ticket-phase-edit input {
+      background: var(--input-background);
+      border: 1px solid var(--border);
+      color: var(--foreground);
+      border-radius: var(--radius);
+      padding: 0.5rem;
+    }
+
+    .btn-add-phase {
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      color: var(--neon-cyan);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .btn-add-phase:hover {
+      background: rgba(0, 212, 255, 0.1);
+      border-color: var(--neon-cyan);
+    }
+
+    .btn-create-event {
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+      color: black;
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .btn-create-event:hover {
+      opacity: 0.9;
+    }
+
+    .btn-cancel-event {
+      flex: 1;
+      padding: 1rem;
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      color: var(--foreground);
+      border-radius: var(--radius);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-cancel-event:hover {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 212, 255, 0.05);
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</body>
+</html>

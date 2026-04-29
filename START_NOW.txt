@@ -1,0 +1,55 @@
+🎵 THE FOURTH LOBBY
+HTML/CSS Prototype
+════════════════════════════════════════════════════════════════
+
+COMEÇAR AGORA EM 2 PASSOS:
+════════════════════════════════════════════════════════════════
+
+1️⃣  DUPLO CLIQUE EM:
+    📄 start-server.bat
+
+2️⃣  ABRA NO NAVEGADOR:
+    🔗 http://localhost:8000
+
+FIM! Veja o website! 🎉
+
+════════════════════════════════════════════════════════════════
+
+📚 FICHEIROS IMPORTANTES:
+
+START:
+  • start-server.bat ................... Iniciar servidor (duplo clique!)
+  
+PÁGINAS:
+  • index.html ........................ Homepage
+  • event-detail.html ................. Detalhes do evento
+  • tickets.html ..................... Bilhetes
+  • promoter.html .................... Promoter dashboard
+  • organizer.html ................... Organizer dashboard
+
+ESTILOS:
+  • styles.css ....................... Todos os estilos CSS
+  • app.js ........................... Lógica JavaScript
+  • data.js .......................... Dados mock
+
+DOCUMENTAÇÃO:
+  • INDEX.md ......................... 📑 Índice geral
+  • README.md ........................ 📖 Documentação completa
+  • QUICK_START.txt .................. ⚡ Guia rápido
+  • FIGMA_IMPORT_GUIDE.md ............ 🎬 Importar no Figma
+  • FEATURES.md ..................... ✨ Funcionalidades
+  • CHECKLIST.md .................... ✅ Verificação
+  • START_NOW.txt ................... 🚀 Este ficheiro!
+
+════════════════════════════════════════════════════════════════
+
+URLs:
+  Homepage:               http://localhost:8000
+  Detalhe Evento:         http://localhost:8000/event-detail.html?id=evt-1
+  Bilhetes:              http://localhost:8000/tickets.html
+  Promoter Dashboard:     http://localhost:8000/promoter.html
+  Organizer Dashboard:    http://localhost:8000/organizer.html
+
+════════════════════════════════════════════════════════════════
+
+Pronto! Aproveite! 🎵

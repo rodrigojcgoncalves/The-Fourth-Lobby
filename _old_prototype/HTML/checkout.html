@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - The Fourth Lobby</title>
+  <link rel="stylesheet" href="../CSS/styles.css">
+</head>
+<body class="dark">
+  <header>
+    <div class="header-content">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">4L</div>
+        <span class="logo-text">The Fourth Lobby</span>
+      </a>
+      <div style="flex: 1;"></div>
+      <a href="index.html" class="nav-link">← Voltar</a>
+    </div>
+  </header>
+
+  <main class="dark" style="padding: 2rem 0;">
+    <div class="container">
+      <h1 style="margin-bottom: 2rem;">Finalizar Compra</h1>
+
+      <div class="checkout-layout">
+        <!-- Left: Order Summary -->
+        <div class="checkout-left">
+          <div class="card">
+            <div class="card-content">
+              <h2 style="margin-bottom: 1.5rem;">Resumo do Pedido</h2>
+
+              <!-- Order Items -->
+              <div class="order-items" id="orderItems">
+                <div class="order-item">
+                  <div class="order-item-info">
+                    <p style="margin: 0;">DIMENSION IV: The Awakening</p>
+                    <p style="margin: 0.25rem 0 0 0; color: var(--muted-foreground); font-size: 0.875rem;">1ª Fase</p>
+                  </div>
+                  <div class="order-item-qty">2x</div>
+                  <div class="order-item-price">€40</div>
+                </div>
+
+                <div style="border-top: 1px solid var(--glass-border); margin: 1rem 0;"></div>
+
+                <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 0.5rem;">
+                  <span>Subtotal</span>
+                  <span>€40</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: var(--muted-foreground); margin-bottom: 1rem;">
+                  <span>Taxa de Serviço</span>
+                  <span>€2</span>
+                </div>
+
+                <div style="border-top: 1px solid var(--glass-border); padding-top: 1rem; display: flex; justify-content: space-between; font-size: 1.25rem; color: var(--neon-cyan);">
+                  <span>Total</span>
+                  <span>€42</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Payment Form -->
+        <div class="checkout-right">
+          <!-- Payment Method Selection -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-content">
+              <h3 style="margin-bottom: 1rem;">Método de Pagamento</h3>
+
+              <div class="payment-methods">
+                <label class="payment-method active">
+                  <input type="radio" name="payment" value="card" checked />
+                  <span class="payment-method-label">
+                    <span class="payment-icon">💳</span>
+                    <span>Cartão de Crédito</span>
+                  </span>
+                </label>
+
+                <label class="payment-method">
+                  <input type="radio" name="payment" value="mbway" />
+                  <span class="payment-method-label">
+                    <span class="payment-icon">📱</span>
+                    <span>MBWay</span>
+                  </span>
+                </label>
+
+                <label class="payment-method">
+                  <input type="radio" name="payment" value="paypal" />
+                  <span class="payment-method-label">
+                    <span class="payment-icon">🅿️</span>
+                    <span>PayPal</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Details Form -->
+          <div class="card" id="cardForm">
+            <div class="card-content">
+              <h3 style="margin-bottom: 1.5rem;">Detalhes do Cartão</h3>
+
+              <form id="paymentForm">
+                <div class="form-group">
+                  <label for="cardname">Nome no Cartão</label>
+                  <input type="text" id="cardname" placeholder="JOÃO SILVA" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="cardnumber">Número do Cartão</label>
+                  <input type="text" id="cardnumber" placeholder="1234 5678 9012 3456" maxlength="19" required />
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                  <div class="form-group">
+                    <label for="expiry">Expiração</label>
+                    <input type="text" id="expiry" placeholder="MM/AA" maxlength="5" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="cvv">CVV</label>
+                    <input type="text" id="cvv" placeholder="123" maxlength="3" required />
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; font-size: 0.875rem;">
+                  <input type="checkbox" id="terms" name="terms" required />
+                  <label for="terms" style="margin: 0; cursor: pointer;">
+                    Concordo com os <a href="#" style="color: var(--neon-cyan);">termos de serviço</a>
+                  </label>
+                </div>
+
+                <button type="submit" class="btn-checkout-pay">
+                  Pagar Agora: €42
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- MBWay Form (Hidden) -->
+          <div class="card" id="mbwayForm" style="display: none;">
+            <div class="card-content">
+              <h3 style="margin-bottom: 1.5rem;">Confirma no teu Telefone</h3>
+
+              <div style="text-align: center; padding: 2rem 0;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+                <p>Abre a app MBWay e confirma o pagamento</p>
+                <p style="color: var(--neon-cyan); font-weight: bold; margin-top: 1rem; font-size: 1.25rem;">€42</p>
+              </div>
+
+              <button type="button" class="btn-checkout-pay" onclick="processPayment()">
+                Confirmei o Pagamento
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../JS/data.js"></script>
+  <script src="../JS/app.js"></script>
+  <script>
+    // Payment method switching
+    document.querySelectorAll('input[name="payment"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const method = e.target.value;
+        document.getElementById('cardForm').style.display = method === 'card' ? 'block' : 'none';
+        document.getElementById('mbwayForm').style.display = method === 'mbway' ? 'block' : 'none';
+
+        // Update payment method UI
+        document.querySelectorAll('.payment-method').forEach(pm => pm.classList.remove('active'));
+        e.target.closest('.payment-method').classList.add('active');
+      });
+    });
+
+    // Form submission
+    document.getElementById('paymentForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      processPayment();
+    });
+
+    function processPayment() {
+      // Simulate payment processing
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = 'Processando...';
+
+      setTimeout(() => {
+        window.location.href = 'success.html';
+      }, 2000);
+    }
+
+    // Card number formatting
+    const cardNumber = document.getElementById('cardnumber');
+    cardNumber.addEventListener('input', (e) => {
+      let value = e.target.value.replace(/\s/g, '');
+      let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+      e.target.value = formatted;
+    });
+
+    // Expiry formatting
+    const expiry = document.getElementById('expiry');
+    expiry.addEventListener('input', (e) => {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length >= 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+      }
+      e.target.value = value;
+    });
+  </script>
+</body>
+</html>

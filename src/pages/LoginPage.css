@@ -1,0 +1,250 @@
+/* Login Page */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(255, 0, 255, 0.05));
+}
+
+.login-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  max-width: 1000px;
+  width: 100%;
+  align-items: center;
+}
+
+.login-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.login-card h1 {
+  text-align: center;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 2rem;
+  font-size: 2rem;
+}
+
+.form-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tab {
+  padding: 0.75rem;
+  background: rgba(0, 212, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.tab:hover,
+.tab.active {
+  background: var(--neon-cyan);
+  color: #000;
+  border-color: var(--neon-cyan);
+}
+
+.login-form fieldset {
+  border: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--input-background);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.checkbox input {
+  width: auto;
+  cursor: pointer;
+  margin: 0;
+}
+
+.btn-large {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.forgot-password {
+  text-align: right;
+  margin: 0 0 1.5rem;
+  font-size: 0.875rem;
+}
+
+.forgot-password a {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+  color: var(--neon-magenta);
+}
+
+.divider {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  background: var(--glass-border);
+  z-index: -1;
+}
+
+.divider {
+  background: var(--background);
+  padding: 0 0.5rem;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.social-login {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.social-btn {
+  padding: 0.75rem;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.social-btn:hover {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: var(--neon-cyan);
+}
+
+.login-note {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.toggle-link {
+  background: none;
+  border: none;
+  color: var(--neon-cyan);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.toggle-link:hover {
+  color: var(--neon-magenta);
+}
+
+.login-info {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.info-card {
+  background: rgba(0, 212, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  border-left: 3px solid var(--neon-cyan);
+}
+
+.info-card h3 {
+  margin: 0 0 0.5rem;
+  color: var(--neon-cyan);
+  font-size: 1.1rem;
+}
+
+.info-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .login-info {
+    display: none;
+  }
+
+  .login-card {
+    padding: 1.5rem;
+  }
+
+  .login-card h1 {
+    font-size: 1.5rem;
+  }
+}
