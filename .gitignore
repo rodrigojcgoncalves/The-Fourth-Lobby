@@ -44,3 +44,6 @@ build
 *.njsproj
 *.sln
 *.sw?
+
+# Project specific
+_old_prototype/

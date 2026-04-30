@@ -10,6 +10,7 @@ import PromoterDashboard from './pages/PromoterDashboard';
 import OrganizerDashboard from './pages/OrganizerDashboard';
 import QRScannerPage from './pages/QRScannerPage';
 import CreateEventPage from './pages/CreateEventPage';
+import EditEventPage from './pages/EditEventPage';
 import CalculatorPage from './pages/CalculatorPage';
 import SuccessPage from './pages/SuccessPage';
 import NotFound from './pages/NotFound';
@@ -43,6 +44,10 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={['organizer']}><CreateEventPage /></ProtectedRoute> 
       },
       { 
+        path: 'organizer/edit-event/:id', 
+        element: <ProtectedRoute allowedRoles={['organizer']}><EditEventPage /></ProtectedRoute> 
+      },
+      { 
         path: 'calculator', 
         element: <ProtectedRoute allowedRoles={['organizer']}><CalculatorPage /></ProtectedRoute> 
       },
@@ -52,7 +57,7 @@ export const router = createBrowserRouter([
       },
       
       // Outras rotas
-      { path: 'events/:id', element: <EventDetailsPage /> },
+      { path: 'events/:slug', element: <EventDetailsPage /> },
       { path: 'checkout', element: <CheckoutPage /> },
       { path: 'success', element: <SuccessPage /> },
       { path: '*', element: <NotFound /> },

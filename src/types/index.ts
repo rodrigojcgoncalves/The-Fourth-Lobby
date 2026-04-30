@@ -12,11 +12,10 @@ export interface User {
 
 export interface Artist {
   id: string;
-  event_id: string;
   name: string;
   genre: string;
-  bio: string;
-  image_url: string;
+  bio?: string;
+  image_url?: string;
 }
 
 export interface TicketType {
@@ -34,12 +33,13 @@ export interface Event {
   id: string;
   organizer_id: string;
   name: string;
+  slug?: string;
   date: string;
   location: string;
   image_url: string;
   description: string;
   capacity: number;
-  status: 'draft' | 'live' | 'finished' | 'cancelled';
+  status: 'draft' | 'published' | 'live' | 'finished' | 'cancelled';
   artists?: Artist[];
   ticket_types?: TicketType[];
 }

@@ -9,14 +9,13 @@ export default function Root() {
   const role = useAuthStore((state) => state.role);
   const signOut = useAuthStore((state) => state.signOut);
 
-  // Convert Supabase user to our User type for Header compatibility
+  // Convert user to our User type for Header compatibility
   const currentUser: User | null = user
     ? {
         id: user.id,
         email: user.email || '',
-        fullName: user.user_metadata?.fullName || user.email?.split('@')[0] || 'User',
+        fullName: user.fullName || user.email?.split('@')[0] || 'User',
         role: role || 'customer',
-        avatar: user.user_metadata?.avatar
       }
     : null;
 

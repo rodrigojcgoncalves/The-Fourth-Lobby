@@ -1,8 +1,6 @@
 # 1. Criação da base de dados.
 
-
 ## Este foi o scrip usado no SQL Editor do supabase para a criação da Base de Dados
-
 
 ```
 
@@ -177,8 +175,8 @@ create policy "Organizadores vêem bilhetes dos seus eventos"
   on public.tickets for select
   using (
     exists (
-      select 1 from public.events 
-      where events.id = tickets.event_id 
+      select 1 from public.events
+      where events.id = tickets.event_id
       and events.organizer_id = auth.uid()
     )
   );
@@ -188,8 +186,8 @@ create policy "Apenas organizadores vêem e gerem despesas"
   on public.expenses for all
   using (
     exists (
-      select 1 from public.events 
-      where events.id = expenses.event_id 
+      select 1 from public.events
+      where events.id = expenses.event_id
       and events.organizer_id = auth.uid()
     )
   );
@@ -208,17 +206,257 @@ RLS: As políticas que defini garantem que um utilizador comum nunca veja as des
 criei 2 buckets 'USER-AVATARS' e 'EVENT-IMAGES'
 
 estes têm algumas policies de RLS por segurança, politicas como:
+
 - Public Acces: permite que qualquer utilizador, logado ou sem conta, consiga ver as imagens, tais como avatares e cartazes
 - Users can update or delete their own avatar: que restringe que apenas utilizadores logados consigam alterar ou apagar o avatar, esta policie confirma também se o user é o user
 - Only organizers can update or delete images: restringe apenas à role ORGANIZER o ato de alterar ou apagar imagens
+
+### 1.1.1 !!! UPDATE NA BD !!!
+
+´´´
+-- 1. Remover a restrição de Foreign Key (A ligação ao Supabase Auth)
+ALTER TABLE public.users
+DROP CONSTRAINT users_id_fkey;
+
+-- 2. Alterar a coluna 'id' para gerar automaticamente os UUIDs
+-- (Porque agora é o teu sistema a criar os utilizadores, não o Supabase)
+ALTER TABLE public.users
+ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+
+-- 3. Adicionar a coluna para a password
+ALTER TABLE public.users
+ADD COLUMN password_hash text;
+
+-- 4. Limpeza: Remover o Trigger do Supabase Auth (Já não vais precisar dele)
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
+
+´´´
+
+### 1.1.2 OUTRA MUDANÇA
+
+´´´
+
+-- 1. Remove a coluna event_id da tabela artists
+ALTER TABLE public.artists DROP COLUMN IF EXISTS event_id;
+
+-- 2. Cria a tabela intermédia event_artists
+CREATE TABLE public.event_artists (
+id uuid primary key default uuid_generate_v4(),
+event_id uuid references public.events(id) on delete cascade,
+artist_id uuid references public.artists(id) on delete cascade,
+created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- 3. Adiciona RLS
+ALTER TABLE public.event_artists ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Qualquer pessoa vê os artistas dos eventos"
+ON public.event_artists FOR SELECT
+USING (true);
+
+´´´
+
+### 1.1.3 OUTRA MUDANÇA - PERMITIR UPLOAD DE FOTOS E LINK PERSONALIZADO
+
+´´´
+-- 1. Adicionar coluna slug à tabela events
+ALTER TABLE public.events ADD COLUMN IF NOT EXISTS slug text;
+
+-- 2. Preencher slugs para eventos existentes (baseado no nome)
+UPDATE public.events
+SET slug = lower(
+regexp_replace(
+regexp_replace(
+translate(name, 'áàãâäéèêëíìîïóòõôöúùûüç', 'aaaaaeeeeiiiiooooouuuuc'),
+'[^a-z0-9\s-]', '', 'g'
+),
+'\s+', '-', 'g'
+)
+)
+WHERE slug IS NULL;
+
+-- 3. Garantir unicidade (opcional mas recomendado)
+CREATE UNIQUE INDEX IF NOT EXISTS events_slug_unique ON public.events (slug);
+
+´´´
+
+#### 1.1.x CÓDIGO SQL ATUALIZADO PARA FAZER O DIAGRAMA FINAL
+
+```sql
+-- 1. EXTENSÕES E TIPOS (ENUMS)
+create extension if not exists "uuid-ossp";
+
+create type user_role as enum ('customer', 'promoter', 'organizer');
+create type event_status as enum ('draft', 'published', 'finished', 'live', 'cancelled');
+create type order_status as enum ('pending', 'completed', 'failed');
+create type ticket_status as enum ('valid', 'used', 'refunded');
+
+-- 2. TABELAS PRINCIPAIS
+
+-- Tabela de utilizadores (Independente do Supabase Auth para este projeto)
+create table public.users (
+  id uuid primary key default uuid_generate_v4(),
+  email text unique not null,
+  password_hash text,
+  role user_role default 'customer',
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Eventos
+create table public.events (
+  id uuid primary key default uuid_generate_v4(),
+  organizer_id uuid references public.users(id) not null,
+  name text not null,
+  slug text unique,
+  description text,
+  date timestamp with time zone not null,
+  location text,
+  capacity int not null,
+  image_url text,
+  status event_status default 'draft',
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Artistas (Global, sem ligação direta a evento)
+create table public.artists (
+  id uuid primary key default uuid_generate_v4(),
+  name text not null,
+  bio text,
+  image_url text,
+  genre text
+);
+
+-- Tabela Intermédia Evento <-> Artista (Many-to-Many)
+create table public.event_artists (
+  id uuid primary key default uuid_generate_v4(),
+  event_id uuid references public.events(id) on delete cascade,
+  artist_id uuid references public.artists(id) on delete cascade,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Tipos de Bilhetes / Fases
+create table public.ticket_types (
+  id uuid primary key default uuid_generate_v4(),
+  event_id uuid references public.events(id) on delete cascade,
+  name text not null,
+  price decimal(10,2) not null,
+  total_quantity int not null,
+  sold_quantity int default 0,
+  start_date timestamp with time zone,
+  end_date timestamp with time zone
+);
+
+-- Encomendas (Transações Financeiras)
+create table public.orders (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references public.users(id),
+  total_amount decimal(10,2) not null,
+  stripe_payment_id text,
+  status order_status default 'pending',
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Itens da Encomenda
+create table public.order_items (
+  id uuid primary key default uuid_generate_v4(),
+  order_id uuid references public.orders(id) on delete cascade,
+  ticket_type_id uuid references public.ticket_types(id),
+  quantity int not null
+);
+
+-- Bilhetes (Ativos individuais)
+create table public.tickets (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references public.users(id),
+  event_id uuid references public.events(id),
+  ticket_type_id uuid references public.ticket_types(id),
+  order_id uuid references public.orders(id),
+  price_paid decimal(10,2),
+  status ticket_status default 'valid',
+  qr_code text unique not null,
+  purchased_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Promotores (RPs)
+create table public.promoters (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references public.users(id) unique,
+  referral_code text unique not null,
+  commission_rate decimal(5,2) default 0.00,
+  total_earned decimal(10,2) default 0.00
+);
+
+-- Conversões de Afiliados
+create table public.affiliate_conversions (
+  id uuid primary key default uuid_generate_v4(),
+  promoter_id uuid references public.promoters(id),
+  ticket_id uuid references public.tickets(id),
+  commission_amount decimal(10,2) not null,
+  status text default 'pending'
+);
+
+-- Despesas Operacionais
+create table public.expenses (
+  id uuid primary key default uuid_generate_v4(),
+  event_id uuid references public.events(id) on delete cascade,
+  description text not null,
+  category text,
+  amount decimal(10,2) not null,
+  date date not null
+);
+
+-- Análise de Sentimento (NLP)
+create table public.sentiment_analyses (
+  id uuid primary key default uuid_generate_v4(),
+  event_id uuid references public.events(id) on delete cascade,
+  platform text,
+  sentiment_score decimal(3,2),
+  collected_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- 3. ÍNDICES
+create index idx_events_organizer on public.events(organizer_id);
+create index idx_events_slug on public.events(slug);
+create index idx_tickets_user on public.tickets(user_id);
+create index idx_tickets_event on public.tickets(event_id);
+create index idx_orders_user on public.orders(user_id);
+create index idx_promoter_code on public.promoters(referral_code);
+
+-- 4. ROW LEVEL SECURITY (RLS)
+alter table public.users enable row level security;
+alter table public.events enable row level security;
+alter table public.artists enable row level security;
+alter table public.event_artists enable row level security;
+alter table public.tickets enable row level security;
+alter table public.expenses enable row level security;
+alter table public.promoters enable row level security;
+
+-- Políticas de exemplo
+create policy "Qualquer pessoa vê eventos publicados"
+  on public.events for select
+  using (status = 'published');
+
+create policy "Organizadores gerem os seus próprios eventos"
+  on public.events for all
+  using (auth.uid() = organizer_id);
+
+create policy "Qualquer pessoa vê artistas"
+  on public.artists for select
+  using (true);
+
+create policy "Qualquer pessoa vê artistas dos eventos"
+  on public.event_artists for select
+  using (true);
+```
 
 ## 1.2 Hugging Face
 
 Criei conta na Hugging face, que é um "github" das IA, onde existem vários modelos de IA's disponiveis para serem usados por devs, o meu objetivo é usar um modelo de NLP pronto
 
-criei token com opção de READ e adicionei ao .env 
+criei token com opção de READ e adicionei ao .env
 
-## 2.   Gestão de Estado com Zustand e a Autenticação
+## 2. Gestão de Estado com Zustand e a Autenticação
 
 Como as políticas de RLS estão ativas, não conseguirás testar as tabelas de eventos ou bilhetes sem um utilizador autenticado.
 

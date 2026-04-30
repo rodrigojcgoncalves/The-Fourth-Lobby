@@ -1,20 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
-import { UserRole } from '../store/authStore';
+import { useAuthStore } from '../store/authStore';
 import './LoginPage.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { setUser } = useAuthStore();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Flag discreta: true se o user clicou em "Sou um organizador"
+  const [isOrganizer, setIsOrganizer] = useState(false);
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     fullName: ''
   });
-  const [selectedRole, setSelectedRole] = useState<UserRole>('customer');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -27,11 +31,20 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      let loggedUser;
       if (isLogin) {
-        await authService.login(formData.email, formData.password);
+        loggedUser = await authService.login(formData.email, formData.password);
       } else {
-        await authService.register(formData.email, formData.password, formData.fullName, selectedRole);
+        // O role é sempre 'customer' por padrão.
+        // Se clicou em "Sou um organizador", envia 'organizer'.
+        const role = isOrganizer ? 'organizer' : 'customer';
+        const data = await authService.register(formData.email, formData.password, formData.fullName, role);
+        loggedUser = data.user;
       }
+      
+      // Atualiza o estado global no Zustand
+      setUser(loggedUser);
+      
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
@@ -39,6 +52,13 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Quando muda de tab, reseta o estado de organizador
+  const handleTabSwitch = (loginMode: boolean) => {
+    setIsLogin(loginMode);
+    setIsOrganizer(false);
+    setError(null);
   };
 
   return (
@@ -52,20 +72,38 @@ export default function LoginPage() {
               <button
                 type="button"
                 className={`tab ${isLogin ? 'active' : ''}`}
-                onClick={() => setIsLogin(true)}
+                onClick={() => handleTabSwitch(true)}
               >
                 Login
               </button>
               <button
                 type="button"
                 className={`tab ${!isLogin ? 'active' : ''}`}
-                onClick={() => setIsLogin(false)}
+                onClick={() => handleTabSwitch(false)}
               >
                 Register
               </button>
             </div>
 
-            {error && <div className="error-message" style={{ color: '#ff0055', marginBottom: '1rem', padding: '0.75rem', borderRadius: '0.5rem', background: 'rgba(255, 0, 85, 0.1)', border: '1px solid #ff0055' }}>{error}</div>}
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
+            {/* Banner visível quando o utilizador está a registar como organizador */}
+            {!isLogin && isOrganizer && (
+              <div className="organizer-banner">
+                🎛️ A criar conta como <strong>Organizador</strong>
+                <button
+                  type="button"
+                  className="organizer-banner-cancel"
+                  onClick={() => setIsOrganizer(false)}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
 
             <fieldset>
               <div className="form-group">
@@ -83,42 +121,18 @@ export default function LoginPage() {
               </div>
 
               {!isLogin && (
-                <>
-                  <div className="form-group">
-                    <label htmlFor="fullName">Full Name</label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      placeholder="John Doe"
-                      disabled={loading}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="role">Account Type</label>
-                    <select
-                      id="role"
-                      value={selectedRole || ''}
-                      onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-                      disabled={loading}
-                      style={{
-                        padding: '0.75rem',
-                        borderRadius: '0.5rem',
-                        border: '1px solid rgba(0, 212, 255, 0.3)',
-                        background: 'rgba(0, 0, 0, 0.5)',
-                        color: '#00d4ff',
-                        cursor: 'pointer',
-                        fontSize: '1rem'
-                      }}
-                    >
-                      <option value="customer">Customer</option>
-                      <option value="promoter">Promoter (RP)</option>
-                      <option value="organizer">Organizer</option>
-                    </select>
-                  </div>
-                </>
+                <div className="form-group">
+                  <label htmlFor="fullName">Full Name</label>
+                  <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    placeholder="John Doe"
+                    disabled={loading}
+                  />
+                </div>
               )}
 
               <div className="form-group">
@@ -148,11 +162,28 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {isLogin && (
-            <p className="forgot-password">
-              <a href="#forgot">Forgot your password?</a>
-            </p>
-          )}
+          {/* Links discretos abaixo do botão principal */}
+          <div className="auth-links">
+            {isLogin && (
+              <p className="forgot-password">
+                <a href="#forgot">Forgot your password?</a>
+              </p>
+            )}
+
+            {/* Link "Sou um organizador" — só aparece no formulário de Registo */}
+            {!isLogin && !isOrganizer && (
+              <p className="forgot-password">
+                <button
+                  type="button"
+                  className="organizer-link"
+                  onClick={() => setIsOrganizer(true)}
+                  disabled={loading}
+                >
+                  Sou um organizador
+                </button>
+              </p>
+            )}
+          </div>
 
           <div className="divider">OR</div>
 
@@ -171,7 +202,7 @@ export default function LoginPage() {
               : 'Already have an account? '}
             <button
               type="button"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => handleTabSwitch(!isLogin)}
               className="toggle-link"
               disabled={loading}
             >

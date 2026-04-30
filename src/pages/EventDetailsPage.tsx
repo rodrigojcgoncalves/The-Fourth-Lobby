@@ -1,46 +1,57 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import { Event } from '../types';
 import './EventDetailsPage.css';
 
 export default function EventDetailsPage() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchEventDetails() {
-      if (!id) return;
+      if (!slug) return;
       try {
-        const { data, error } = await supabase
-          .from('events')
-          .select('*, artists(*), ticket_types(*)')
-          .eq('id', id)
-          .single();
+        // Tenta pelo slug primeiro; se falhar, tenta pelo UUID (compatibilidade)
+        const res = await fetch(`http://localhost:5000/api/events/slug/${slug}`);
 
-        if (error) throw error;
+        if (!res.ok) {
+          // Fallback: tenta pelo UUID caso o slug ainda não exista
+          const fallback = await fetch(`http://localhost:5000/api/events/${slug}`);
+          if (!fallback.ok) throw new Error('Evento não encontrado.');
+          const data = await fallback.json();
+          setEvent(data as Event);
+          return;
+        }
+
+        const data = await res.json();
         setEvent(data as Event);
       } catch (err) {
-        console.error("Error fetching event details:", err);
+        console.error('Error fetching event details:', err);
       } finally {
         setLoading(false);
       }
     }
     
     fetchEventDetails();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
-    return <div className="container"><p>Loading event details...</p></div>;
+    return (
+      <div className="container" style={{ paddingTop: '4rem', textAlign: 'center' }}>
+        <p>A carregar o evento...</p>
+      </div>
+    );
   }
 
   if (!event) {
     return (
-      <div className="container">
-        <h2>Event not found</h2>
-        <button onClick={() => navigate('/')}>Go back to home</button>
+      <div className="container" style={{ paddingTop: '4rem', textAlign: 'center' }}>
+        <h2>Evento não encontrado</h2>
+        <button className="btn-primary" onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>
+          Voltar à Homepage
+        </button>
       </div>
     );
   }
@@ -58,7 +69,7 @@ export default function EventDetailsPage() {
       >
         <div className="event-hero-content">
           <h1>{event.name}</h1>
-          <p className="event-subtitle">Featuring the hardest techno beats</p>
+          <p className="event-subtitle">{event.location}</p>
         </div>
       </section>
 
@@ -67,30 +78,36 @@ export default function EventDetailsPage() {
         <section className="event-info">
           <div className="info-grid">
             <div className="info-block">
-              <h3>Date</h3>
+              <h3>Data</h3>
               <p>{new Date(event.date).toLocaleDateString('pt-PT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
             </div>
             <div className="info-block">
-              <h3>Location</h3>
+              <h3>Hora</h3>
+              <p>{new Date(event.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</p>
+            </div>
+            <div className="info-block">
+              <h3>Local</h3>
               <p>{event.location}</p>
             </div>
             <div className="info-block">
-              <h3>Status</h3>
-              <p className="status-badge">{event.status.toUpperCase()}</p>
+              <h3>Capacidade</h3>
+              <p>{event.capacity} pessoas</p>
             </div>
           </div>
         </section>
 
         {/* Description */}
-        <section className="description-section">
-          <h2>About This Event</h2>
-          <p>{event.description}</p>
-        </section>
+        {event.description && (
+          <section className="description-section">
+            <h2>Sobre Este Evento</h2>
+            <p>{event.description}</p>
+          </section>
+        )}
 
         {/* Lineup */}
         {event.artists && event.artists.length > 0 && (
           <section className="lineup-section">
-            <h2>Lineup</h2>
+            <h2>Line-up</h2>
             <div className="lineup-grid">
               {event.artists.map(artist => (
                 <div key={artist.id} className="artist-card">
@@ -100,7 +117,7 @@ export default function EventDetailsPage() {
                   <div className="artist-info">
                     <h3>{artist.name}</h3>
                     <p className="genre">{artist.genre}</p>
-                    <p className="bio">{artist.bio}</p>
+                    {artist.bio && <p className="bio">{artist.bio}</p>}
                   </div>
                 </div>
               ))}
@@ -110,39 +127,44 @@ export default function EventDetailsPage() {
 
         {/* Ticket Phases */}
         <section className="tickets-section">
-          <h2>Get Your Tickets</h2>
-          <div className="ticket-phases">
-            {event.ticket_types && event.ticket_types.map(phase => {
-              const available = phase.total_quantity - phase.sold_quantity;
-              const isActive = available > 0 && new Date(phase.start_date) <= new Date() && new Date(phase.end_date) >= new Date();
-              
-              return (
-                <div key={phase.id} className="ticket-phase-card">
-                  <div className="phase-header">
-                    <h3>{phase.name}</h3>
-                    {isActive ? (
-                      <span className="badge-active">ACTIVE</span>
-                    ) : (
-                      <span className="badge-inactive">INACTIVE</span>
-                    )}
+          <h2>Comprar Bilhetes</h2>
+          {event.ticket_types && event.ticket_types.length > 0 ? (
+            <div className="ticket-phases">
+              {event.ticket_types.map(phase => {
+                const available = phase.total_quantity - phase.sold_quantity;
+                // Simplificado: fase está ativa se tiver bilhetes disponíveis
+                const isActive = available > 0;
+                
+                return (
+                  <div key={phase.id} className="ticket-phase-card">
+                    <div className="phase-header">
+                      <h3>{phase.name}</h3>
+                      {isActive ? (
+                        <span className="badge-active">DISPONÍVEL</span>
+                      ) : (
+                        <span className="badge-inactive">ESGOTADO</span>
+                      )}
+                    </div>
+                    <div className="phase-details">
+                      <p className="price">€{Number(phase.price).toFixed(2)}</p>
+                      <p className="availability">
+                        {available} de {phase.total_quantity} disponíveis
+                      </p>
+                    </div>
+                    <button 
+                      className="btn-primary"
+                      onClick={handleBuyTickets}
+                      disabled={!isActive || available === 0}
+                    >
+                      {available === 0 ? 'Esgotado' : 'Comprar Bilhete'}
+                    </button>
                   </div>
-                  <div className="phase-details">
-                    <p className="price">€{phase.price}</p>
-                    <p className="availability">
-                      {available} of {phase.total_quantity} available
-                    </p>
-                  </div>
-                  <button 
-                    className="btn-primary"
-                    onClick={handleBuyTickets}
-                    disabled={!isActive || available === 0}
-                  >
-                    {available === 0 ? 'Sold Out' : 'Buy Tickets'}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p style={{ color: 'rgba(255,255,255,0.5)' }}>Bilhetes ainda não disponíveis.</p>
+          )}
         </section>
       </div>
     </div>

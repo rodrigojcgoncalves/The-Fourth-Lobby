@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import { Event } from '../types';
 import EventCard from '../components/EventCard';
 import './HomePage.css';
+
+// Imagens locais (via alias @img configurado no vite.config.ts)
+import heroBg from '@img/backgrounds/fourthdimension_neket_hoff.jpg';
+import logoFourthDimension from '@img/fourthdimension_logo.png';
+import albumPhoto from '@img/mediacenter/album_photo_cape.jpg';
+import pharahThumb from '@img/mediacenter/pharah_thumbnail.jpg';
+import rebbelleThumb from '@img/mediacenter/rebbelle_thumbnail.png';
 
 export default function HomePage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -13,120 +19,88 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const { data, error } = await supabase
-          .from('events')
-          .select('*')
-          .eq('status', 'live')
-          .order('date', { ascending: true });
-          
-        if (error) throw error;
+        const res = await fetch('http://localhost:5000/api/events');
+        if (!res.ok) throw new Error('Failed to fetch events');
+        const data = await res.json();
         setEvents(data as Event[]);
       } catch (err) {
-        console.error("Error fetching events:", err);
+        console.error('Error fetching events:', err);
       } finally {
         setLoading(false);
       }
     }
-    
     fetchEvents();
   }, []);
 
   const handleGetTickets = () => {
-    navigate('/checkout');
+    navigate('/events');
   };
-
-  const upcomingEvents = events;
 
   return (
     <div className="home-page">
-      {/* Hero Section */}
-      <section className="hero" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80')" }}>
+      {/* ── Hero Section ── */}
+      <section className="hero" style={{ backgroundImage: `url(${heroBg})` }}>
         <div className="hero-content">
-          <h1>Enter The Fourth Dimension</h1>
-          <p>Porto's premier HardTechno label bringing you the hardest beats and darkest nights</p>
-          <button className="btn-primary" onClick={handleGetTickets}>
+          <img src={logoFourthDimension} alt="Fourth Dimension" className="hero-logo" />
+          <p>Where the Fourth Dimension begins...</p>
+          <button className="btn-hero" onClick={handleGetTickets}>
             Get Tickets Now
           </button>
         </div>
       </section>
 
-      {/* Upcoming Events */}
-      <section className="container section">
-        <h2>Upcoming Events</h2>
+      {/* ── Upcoming Events ── */}
+      <section className="home-section container">
+        <h2 className="section-title">Upcoming Events</h2>
         {loading ? (
-          <p>Loading events...</p>
+          <p className="loading-text">Loading events...</p>
+        ) : events.length === 0 ? (
+          <p className="loading-text">No upcoming events at the moment.</p>
         ) : (
-          <div className="grid grid-cols-3">
-            {upcomingEvents.map(event => (
+          <div className="events-grid">
+            {events.map(event => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>
         )}
       </section>
 
-      {/* Media Center */}
-      <section className="container section">
-        <h2>Media Center</h2>
+      {/* ── Media Center ── */}
+      <section className="home-section container">
+        <h2 className="section-title">Media Center</h2>
         <div className="media-grid">
           <a href="#" className="media-item">
             <div className="media-image">
-              <img src="https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=400&q=80" alt="Event Photo" />
-              <div className="media-badge">Photo</div>
+              <img src={albumPhoto} alt="4TH x DW Album Photos" />
+              <div className="media-badge">PHOTO</div>
             </div>
             <div className="media-content">
-              <h3>DIMENSION IV Pre-Event</h3>
-              <p>Check out the behind-the-scenes photos</p>
+              <h3>4TH x DW Album Photos</h3>
+              <p>Check out the photos from the last party album</p>
             </div>
           </a>
 
           <a href="#" className="media-item">
             <div className="media-image">
-              <img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&q=80" alt="Event Video" />
-              <div className="media-badge">Video</div>
+              <img src={rebbelleThumb} alt="Rebbelle Opening Set" />
+              <div className="media-badge">SET</div>
             </div>
             <div className="media-content">
-              <h3>Aftermovie DIMENSION III</h3>
-              <p>Relive the magic from our last edition</p>
+              <h3>REBBELLE OPENING SET</h3>
+              <p>REBBELLE's opening set from 4th Dimension w/ Pharah</p>
             </div>
           </a>
 
           <a href="#" className="media-item">
             <div className="media-image">
-              <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&q=80" alt="Live Set" />
-              <div className="media-badge">Set</div>
+              <img src={pharahThumb} alt="Pharah Closing Set" />
+              <div className="media-badge">SET</div>
             </div>
             <div className="media-content">
-              <h3>KOBOSIL Live Set</h3>
-              <p>Experience the full techno journey</p>
+              <h3>PHARAH CLOSING SET</h3>
+              <p>PHARAH's closing set from 4th Dimension w/ Pharah</p>
             </div>
           </a>
-        </div>
-      </section>
-
-      {/* Testimonials/Info */}
-      <section className="container section info-section">
-        <h2>Why Choose Us</h2>
-        <div className="info-grid">
-          <div className="info-card">
-            <div className="icon">🎵</div>
-            <h3>World-Class Lineup</h3>
-            <p>International headliners and local talents performing cutting-edge techno</p>
-          </div>
-          <div className="info-card">
-            <div className="icon">🎫</div>
-            <h3>Easy Ticketing</h3>
-            <p>Simple and secure ticket purchasing with multiple payment options</p>
-          </div>
-          <div className="info-card">
-            <div className="icon">📍</div>
-            <h3>Premium Venues</h3>
-            <p>Carefully selected locations designed for optimal acoustics and atmosphere</p>
-          </div>
-          <div className="info-card">
-            <div className="icon">🌙</div>
-            <h3>Unforgettable Nights</h3>
-            <p>Experience the darkest and hardest techno music in Europe</p>
-          </div>
         </div>
       </section>
     </div>
