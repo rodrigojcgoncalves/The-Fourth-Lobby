@@ -1,49 +1,49 @@
 # The Fourth Lobby
 
-Event ticketing and management platform for electronic music events, built as a final course project. The system supports the full lifecycle of an event — from creation and ticket sales to attendee check-in and financial tracking.
+Plataforma de bilhética e gestão de eventos de música eletrónica, desenvolvida como projeto final de curso. O sistema suporta o ciclo completo de um evento — desde a criação e venda de bilhetes até ao check-in de participantes e controlo financeiro.
 
 ---
 
-## Architecture Overview
+## Visão Geral da Arquitectura
 
-The project follows a client-server architecture with a React SPA on the frontend and a custom Node.js/Express API on the backend. Both communicate with a Supabase (PostgreSQL) database. Authentication is handled via JWT tokens issued by the backend, not the Supabase client directly, allowing for fine-grained role-based access control.
+O projeto segue uma arquitectura cliente-servidor com uma SPA em React no frontend e uma API REST em Node.js/Express no backend. Ambos comunicam com uma base de dados Supabase (PostgreSQL). A autenticação é feita via tokens JWT emitidos pelo backend, o que permite um controlo de acessos granular por role.
 
 ```
-Frontend (React/Vite) → REST API (Node.js/Express) → Supabase (PostgreSQL)
+Frontend (React/Vite) → API REST (Node.js/Express) → Supabase (PostgreSQL)
 ```
 
 ---
 
-## Tech Stack
+## Stack Tecnológico
 
 ### Frontend
-| Technology | Purpose |
+| Tecnologia | Função |
 |---|---|
-| React 18 + TypeScript | UI framework |
-| Vite | Build tool and dev server |
-| React Router v6 | Client-side routing |
-| Zustand | Global state management |
-| qrcode.react | QR code generation for tickets |
-| Lucide React | Icon library |
+| React 18 + TypeScript | Framework de UI |
+| Vite | Build tool e servidor de desenvolvimento |
+| React Router v6 | Routing client-side |
+| Zustand | Gestão de estado global |
+| qrcode.react | Geração de QR Codes para bilhetes |
+| Lucide React | Biblioteca de ícones |
 
 ### Backend
-| Technology | Purpose |
+| Tecnologia | Função |
 |---|---|
-| Node.js + Express | REST API server |
-| Supabase JS SDK | Database client (PostgreSQL) |
-| Supabase Storage | Image file uploads |
-| JSON Web Tokens | Authentication |
+| Node.js + Express | Servidor REST API |
+| Supabase JS SDK | Cliente de base de dados (PostgreSQL) |
+| Supabase Storage | Upload de imagens |
+| JSON Web Tokens | Autenticação |
 
 ---
 
-## Getting Started
+## Primeiros Passos
 
-### Prerequisites
+### Pré-requisitos
 
 - Node.js 18+
-- A Supabase project with the appropriate tables and storage buckets configured
+- Um projeto Supabase com as tabelas e buckets de storage configurados
 
-### 1. Install dependencies
+### 1. Instalar dependências
 
 ```bash
 # Frontend
@@ -54,110 +54,110 @@ cd backend
 npm install
 ```
 
-### 2. Configure environment variables
+### 2. Configurar variáveis de ambiente
 
-**Frontend** — create `.env` in the project root:
+**Frontend** — criar `.env` na raiz do projeto:
 
 ```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_URL=url_do_teu_projeto_supabase
+VITE_SUPABASE_ANON_KEY=chave_anon_supabase
 ```
 
-**Backend** — create `.env` inside the `/backend` directory:
+**Backend** — criar `.env` dentro da pasta `/backend`:
 
 ```env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-JWT_SECRET=your_jwt_secret
+SUPABASE_URL=url_do_teu_projeto_supabase
+SUPABASE_SERVICE_ROLE_KEY=chave_service_role_supabase
+JWT_SECRET=segredo_jwt
 PORT=5000
 ```
 
-> The backend uses the service role key to bypass Supabase RLS where needed. Keep it secret and never expose it on the frontend.
+> O backend utiliza a service role key para contornar o RLS do Supabase onde necessário. Nunca a exponhas no frontend nem a commits ao repositório.
 
-### 3. Run the development servers
+### 3. Iniciar os servidores de desenvolvimento
 
 ```bash
-# Start the frontend (port 5173)
+# Frontend (porta 5173)
 npm run dev
 
-# Start the backend (port 5000)
+# Backend (porta 5000)
 cd backend
 node server.js
 ```
 
 ---
 
-## Project Structure
+## Estrutura do Projeto
 
 ```
 the-fourth-lobby/
 ├── backend/
 │   ├── middleware/
-│   │   └── auth.js            # JWT verification, role enforcement
+│   │   └── auth.js            # Verificação JWT e controlo de roles
 │   ├── routes/
-│   │   ├── auth.js            # Login, register
-│   │   ├── events.js          # Event CRUD + image upload
-│   │   ├── artists.js         # Artist management
-│   │   ├── tickets.js         # Ticket purchase and validation
-│   │   ├── expenses.js        # Event expense tracking
-│   │   ├── orders.js          # Order management
-│   │   └── organizer.js       # Organizer-specific statistics
+│   │   ├── auth.js            # Login e registo
+│   │   ├── events.js          # CRUD de eventos + upload de imagens
+│   │   ├── artists.js         # Gestão de artistas
+│   │   ├── tickets.js         # Compra e validação de bilhetes
+│   │   ├── expenses.js        # Registo de despesas por evento
+│   │   ├── orders.js          # Gestão de encomendas
+│   │   └── organizer.js       # Estatísticas exclusivas do organizador
 │   └── server.js
 ├── src/
 │   ├── components/
 │   │   └── layout/            # Header, OrganizerLayout (sidebar)
-│   ├── pages/                 # One file per route/view
-│   ├── services/              # API communication layer
-│   ├── store/                 # Zustand global state (auth)
-│   ├── types/                 # Shared TypeScript interfaces
-│   └── index.css              # Global design system (CSS variables)
+│   ├── pages/                 # Um ficheiro por rota/vista
+│   ├── services/              # Camada de comunicação com a API
+│   ├── store/                 # Estado global com Zustand (autenticação)
+│   ├── types/                 # Interfaces TypeScript partilhadas
+│   └── index.css              # Design system global (variáveis CSS)
 └── public/
-    └── img/                   # Static brand assets
+    └── img/                   # Assets estáticos da marca
 ```
 
 ---
 
-## User Roles
+## Roles de Utilizador
 
-Access control is enforced on the backend via middleware. Three roles are supported:
+O controlo de acessos é aplicado no backend via middleware. São suportados três roles:
 
-| Role | Permissions |
+| Role | Permissões |
 |---|---|
-| `customer` | Browse events, purchase tickets, view own tickets |
-| `promoter` | View sales metrics for events they are linked to |
-| `organizer` | Full event management, artist management, expense tracking, statistics |
+| `customer` | Ver eventos, comprar bilhetes, consultar os seus próprios bilhetes |
+| `promoter` | Consultar métricas de vendas de eventos aos quais está associado |
+| `organizer` | Gestão completa de eventos, artistas, despesas e estatísticas |
 
 ---
 
-## API Endpoints
+## Endpoints da API
 
-| Method | Endpoint | Auth | Description |
+| Método | Endpoint | Auth | Descrição |
 |---|---|---|---|
-| POST | `/api/auth/register` | — | Create account |
-| POST | `/api/auth/login` | — | Authenticate, receive JWT |
-| GET | `/api/events` | — | List published events |
-| POST | `/api/events` | Organizer | Create event |
-| POST | `/api/events/:id/upload-image` | Organizer | Upload event cover |
-| GET | `/api/tickets/my` | Customer | Fetch own tickets |
-| POST | `/api/tickets/purchase` | Customer | Purchase a ticket |
-| GET | `/api/expenses/event/:id` | Organizer | List expenses for event |
-| POST | `/api/expenses/event/:id` | Organizer | Add expense |
-| PATCH | `/api/expenses/:id/toggle-paid` | Organizer | Toggle paid/pending status |
-| DELETE | `/api/expenses/:id` | Organizer | Delete expense |
+| POST | `/api/auth/register` | — | Criar conta |
+| POST | `/api/auth/login` | — | Autenticar, receber JWT |
+| GET | `/api/events` | — | Listar eventos publicados |
+| POST | `/api/events` | Organizador | Criar evento |
+| POST | `/api/events/:id/upload-image` | Organizador | Upload de capa do evento |
+| GET | `/api/tickets/my` | Cliente | Consultar bilhetes próprios |
+| POST | `/api/tickets/purchase` | Cliente | Comprar bilhete |
+| GET | `/api/expenses/event/:id` | Organizador | Listar despesas de um evento |
+| POST | `/api/expenses/event/:id` | Organizador | Adicionar despesa |
+| PATCH | `/api/expenses/:id/toggle-paid` | Organizador | Alternar estado pago/pendente |
+| DELETE | `/api/expenses/:id` | Organizador | Apagar despesa |
 
 ---
 
-## Supabase Storage
+## Storage de Imagens
 
-Images are stored in the `event-images` bucket, organised into subfolders:
+As imagens são guardadas no bucket `event-images` do Supabase, organizadas em subpastas:
 
-- `event-images/events/` — event cover photos
-- `event-images/artists/` — artist profile photos
+- `event-images/events/` — capas dos eventos
+- `event-images/artists/` — fotos de perfil dos artistas
 
 ---
 
-## Notes
+## Notas
 
-- This project was developed as a final course project (Projeto Final de Curso) for a web development programme.
-- The codebase evolved from an early static HTML/CSS/JS prototype into a full SPA. The original prototype is archived in `_old_prototype/` for reference.
-- There is no production deployment currently configured. All services run locally during development.
+- Este projeto foi desenvolvido como Projeto Final de Curso para uma formação em desenvolvimento web.
+- A aplicação evoluiu de um protótipo estático em HTML/CSS/JS com servidor Python para uma SPA moderna com o ecossistema React.
+- Não existe atualmente nenhum ambiente de produção configurado. Todos os serviços correm localmente durante o desenvolvimento.
