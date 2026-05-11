@@ -82,12 +82,17 @@ router.get('/my/events', verifyToken, requireRole('organizer'), async (req, res)
   }
 });
 
-// GET /api/events/slug/:slug - Ver evento por slug amigável
+// GET /api/events/slug/:slug - Ver evento por slug amigável (público)
 router.get('/slug/:slug', async (req, res) => {
   try {
+    // Buscar o evento com fases e artistas
     const { data, error } = await supabase
       .from('events')
-      .select('*, ticket_types(*)')
+      .select(`
+        *,
+        ticket_types(id, name, description, price, total_quantity, sold_quantity),
+        event_artists(artist_id, artists(id, name, genre, image_url, bio))
+      `)
       .eq('slug', req.params.slug)
       .single();
 
@@ -95,23 +100,39 @@ router.get('/slug/:slug', async (req, res) => {
       return res.status(404).json({ message: 'Evento não encontrado.' });
     }
 
-    // Se não estiver publicado, verificar se é o próprio organizador
-    if (data.status !== 'published') {
+    // Verificar se o organizador está a aceder ao seu próprio evento não publicado
+    const isOwner = await (async () => {
       const authHeader = req.headers.authorization;
-      if (!authHeader) return res.status(404).json({ message: 'Evento não encontrado.' });
-
+      if (!authHeader) return false;
       const jwt = require('jsonwebtoken');
       try {
         const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
-        if (decoded.id !== data.organizer_id) {
-          return res.status(404).json({ message: 'Evento não encontrado.' });
-        }
-      } catch {
-        return res.status(404).json({ message: 'Evento não encontrado.' });
-      }
+        return decoded.id === data.organizer_id;
+      } catch { return false; }
+    })();
+
+    if (data.status !== 'published' && !isOwner) {
+      return res.status(404).json({ message: 'Evento não encontrado.' });
     }
 
-    res.json(data);
+    // Normalizar artistas (extrair do join)
+    const artists = (data.event_artists || []).map(ea => ea.artists).filter(Boolean);
+
+    // Ocultar quantidades do público (apenas o organizador vê os números reais)
+    const ticket_types = (data.ticket_types || []).map(tt => {
+      if (isOwner) return tt; // Organizador vê tudo
+      const available = tt.total_quantity - tt.sold_quantity;
+      return {
+        id: tt.id,
+        name: tt.name,
+        description: tt.description,
+        price: tt.price,
+        availability: available > 0 ? 'Disponível' : 'Esgotado'
+      };
+    });
+
+    const { event_artists: _, ...eventData } = data;
+    res.json({ ...eventData, ticket_types, artists });
   } catch (err) {
     res.status(500).json({ message: 'Erro ao carregar evento.', error: err.message });
   }
@@ -128,7 +149,7 @@ router.post('/upload', verifyToken, requireRole('organizer'), upload.single('ima
     const fileName = `events/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
     
     const { error } = await supabase.storage
-      .from('EVENT-IMAGES')
+      .from('event-images')
       .upload(fileName, req.file.buffer, {
         contentType: req.file.mimetype,
         upsert: false
@@ -137,7 +158,7 @@ router.post('/upload', verifyToken, requireRole('organizer'), upload.single('ima
     if (error) throw error;
 
     const { data: publicUrlData } = supabase.storage
-      .from('EVENT-IMAGES')
+      .from('event-images')
       .getPublicUrl(fileName);
 
     res.status(200).json({ 
@@ -184,6 +205,7 @@ router.post('/', verifyToken, requireRole('organizer'), async (req, res) => {
       const ticketTypesToInsert = phases.map(p => ({
         event_id: eventId,
         name: p.name,
+        description: p.description || null,
         price: p.price,
         total_quantity: p.quantity,
         sold_quantity: 0
@@ -220,12 +242,16 @@ router.post('/', verifyToken, requireRole('organizer'), async (req, res) => {
 // ROTAS DINÂMICAS COM :id (têm de vir DEPOIS das estáticas)
 // ─────────────────────────────────────────────────────
 
-// GET /api/events/:id - Ver detalhes de um evento por UUID
+// GET /api/events/:id - Ver detalhes de um evento por UUID (uso interno/organizer)
 router.get('/:id', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('events')
-      .select('*, ticket_types(*)')
+      .select(`
+        *,
+        ticket_types(id, name, description, price, total_quantity, sold_quantity),
+        event_artists(artist_id, artists(id, name, genre, image_url, bio))
+      `)
       .eq('id', req.params.id)
       .single();
 
@@ -233,22 +259,23 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Evento não encontrado.' });
     }
 
-    if (data.status !== 'published') {
+    const isOwner = await (async () => {
       const authHeader = req.headers.authorization;
-      if (!authHeader) return res.status(404).json({ message: 'Evento não encontrado.' });
-
+      if (!authHeader) return false;
       const jwt = require('jsonwebtoken');
       try {
         const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
-        if (decoded.id !== data.organizer_id) {
-          return res.status(404).json({ message: 'Evento não encontrado.' });
-        }
-      } catch {
-        return res.status(404).json({ message: 'Evento não encontrado.' });
-      }
+        return decoded.id === data.organizer_id;
+      } catch { return false; }
+    })();
+
+    if (data.status !== 'published' && !isOwner) {
+      return res.status(404).json({ message: 'Evento não encontrado.' });
     }
 
-    res.json(data);
+    const artists = (data.event_artists || []).map(ea => ea.artists).filter(Boolean);
+    const { event_artists: _, ...eventData } = data;
+    res.json({ ...eventData, artists });
   } catch (err) {
     res.status(500).json({ message: 'Erro ao carregar evento.', error: err.message });
   }
@@ -290,20 +317,41 @@ router.put('/:id', verifyToken, requireRole('organizer'), async (req, res) => {
 
     if (updateError) throw updateError;
 
-    // 4. Substituir fases (apagar antigas, inserir novas)
+    // 4. Substituir fases (seguro contra eliminação de bilhetes vendidos)
     if (phases !== undefined) {
-      await supabase.from('ticket_types').delete().eq('event_id', id);
+      const { data: existingPhases } = await supabase.from('ticket_types').select('id, sold_quantity').eq('event_id', id);
+      const newPhaseIds = phases.map(p => p.id).filter(pid => pid && pid.length === 36 && pid.includes('-'));
+
+      // Apagar fases que foram removidas pelo utilizador, MAS APENAS se ainda não venderam bilhetes
+      if (existingPhases) {
+        const phasesToDelete = existingPhases.filter(ep => !newPhaseIds.includes(ep.id) && ep.sold_quantity === 0);
+        if (phasesToDelete.length > 0) {
+          await supabase.from('ticket_types').delete().in('id', phasesToDelete.map(p => p.id));
+        }
+      }
+
+      // Upsert das fases que vieram do frontend
       if (phases.length > 0) {
-        const { error: phasesError } = await supabase
-          .from('ticket_types')
-          .insert(phases.map(p => ({
+        for (const p of phases) {
+          // Um ID é considerado "existente" se for um UUID válido (36 chars com hífens) E não começar com 'new-'
+          const isExistingRecord = p.id && p.id.length === 36 && p.id.includes('-') && !p.id.startsWith('new-');
+          const payload = {
             event_id: id,
             name: p.name,
+            description: p.description || null,
             price: Number(p.price),
-            total_quantity: Number(p.quantity),
-            sold_quantity: 0
-          })));
-        if (phasesError) console.error('Erro ao reinserir fases:', phasesError.message);
+            total_quantity: Number(p.quantity)
+          };
+          
+          if (isExistingRecord) {
+            const { error: pErr } = await supabase.from('ticket_types').update(payload).eq('id', p.id);
+            if (pErr) console.error('Erro ao atualizar fase:', pErr.message);
+          } else {
+            payload.sold_quantity = 0;
+            const { error: pErr } = await supabase.from('ticket_types').insert([payload]);
+            if (pErr) console.error('Erro ao inserir nova fase:', pErr.message);
+          }
+        }
       }
     }
 

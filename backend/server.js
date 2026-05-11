@@ -15,12 +15,16 @@ const eventRoutes = require('./routes/events');
 const ticketRoutes = require('./routes/tickets');
 const expenseRoutes = require('./routes/expenses');
 const artistRoutes = require('./routes/artists');
+const orderRoutes = require('./routes/orders');
+const organizerRoutes = require('./routes/organizer');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/artists', artistRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/organizer', organizerRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

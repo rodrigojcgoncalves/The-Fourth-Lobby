@@ -18,9 +18,15 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-const requireRole = (role) => {
+// Aceita uma role singular ou um array de roles (ex: requireRole(['organizer', 'promoter']))
+const requireRole = (roles) => {
+  const allowed = Array.isArray(roles) ? roles : [roles];
   return (req, res, next) => {
-    if (!req.user || req.user.role !== role) {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Autenticação necessária.' });
+    }
+    if (!allowed.includes(req.user.role)) {
+      console.warn(`[RBAC] Acesso negado: ${req.user.email} (${req.user.role}) tentou aceder a rota restrita a [${allowed.join(', ')}]`);
       return res.status(403).json({ message: 'Acesso proibido. Permissões insuficientes.' });
     }
     next();

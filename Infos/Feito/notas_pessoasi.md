@@ -213,7 +213,8 @@ estes têm algumas policies de RLS por segurança, politicas como:
 
 ### 1.1.1 !!! UPDATE NA BD !!!
 
-´´´
+```sql
+
 -- 1. Remover a restrição de Foreign Key (A ligação ao Supabase Auth)
 ALTER TABLE public.users
 DROP CONSTRAINT users_id_fkey;
@@ -231,11 +232,11 @@ ADD COLUMN password_hash text;
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
 
-´´´
+```
 
 ### 1.1.2 OUTRA MUDANÇA
 
-´´´
+```sql
 
 -- 1. Remove a coluna event_id da tabela artists
 ALTER TABLE public.artists DROP COLUMN IF EXISTS event_id;
@@ -255,11 +256,11 @@ CREATE POLICY "Qualquer pessoa vê os artistas dos eventos"
 ON public.event_artists FOR SELECT
 USING (true);
 
-´´´
+```
 
 ### 1.1.3 OUTRA MUDANÇA - PERMITIR UPLOAD DE FOTOS E LINK PERSONALIZADO
 
-´´´
+```sql
 -- 1. Adicionar coluna slug à tabela events
 ALTER TABLE public.events ADD COLUMN IF NOT EXISTS slug text;
 
@@ -279,7 +280,60 @@ WHERE slug IS NULL;
 -- 3. Garantir unicidade (opcional mas recomendado)
 CREATE UNIQUE INDEX IF NOT EXISTS events_slug_unique ON public.events (slug);
 
-´´´
+```
+
+### 1.1.4 ADICIONAR LINHA DE DESCRIÇÃO DE FASES
+
+```sql
+
+-- Adicionar campo de descrição às fases de bilhetes
+ALTER TABLE public.ticket_types
+ADD COLUMN IF NOT EXISTS description text;
+
+```
+
+### 1.1.5 Correção de venda de bilhetes esgotados, e apagar tickets ao editar evento
+
+```sql
+
+-- 1. Função Atómica para RESERVAR bilhetes
+CREATE OR REPLACE FUNCTION reserve_tickets(p_ticket_type_id UUID, p_quantity INT)
+RETURNS BOOLEAN AS $$
+DECLARE
+  v_available INT;
+BEGIN
+  -- Faz o bloqueio (lock) na linha específica da fase de bilhetes
+  SELECT (total_quantity - sold_quantity) INTO v_available
+  FROM public.ticket_types
+  WHERE id = p_ticket_type_id
+  FOR UPDATE;
+
+  -- Se houver stock suficiente, atualiza e retorna TRUE
+  IF v_available >= p_quantity THEN
+    UPDATE public.ticket_types
+    SET sold_quantity = sold_quantity + p_quantity
+    WHERE id = p_ticket_type_id;
+    RETURN TRUE;
+  ELSE
+    -- Se não houver, bloqueia a compra
+    RETURN FALSE;
+  END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+-- 2. Função Atómica para LIBERTAR bilhetes (Usada em caso de Rollback/Erro na compra)
+CREATE OR REPLACE FUNCTION release_tickets(p_ticket_type_id UUID, p_quantity INT)
+RETURNS VOID AS $$
+BEGIN
+  -- Devolve o stock, garantindo que não fica com valores negativos
+  UPDATE public.ticket_types
+  SET sold_quantity = GREATEST(sold_quantity - p_quantity, 0)
+  WHERE id = p_ticket_type_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+```
 
 #### 1.1.x CÓDIGO SQL ATUALIZADO PARA FAZER O DIAGRAMA FINAL
 
@@ -450,6 +504,36 @@ create policy "Qualquer pessoa vê artistas dos eventos"
   using (true);
 ```
 
+### Criar tabelas de labels, para melhor organização a longo prazo dos eventos
+
+```sql
+
+-- Adicionar as colunas novas à tabela expenses existente
+ALTER TABLE public.expenses ADD COLUMN IF NOT EXISTS is_paid boolean default false;
+ALTER TABLE public.expenses ADD COLUMN IF NOT EXISTS paid_by text;
+
+-- 1. Criar a tabela Labels
+CREATE TABLE public.labels (
+  id uuid primary key default uuid_generate_v4(),
+  owner_id uuid references public.users(id) on delete cascade unique not null,
+  name text not null,
+  slug text unique not null,
+  bio text,
+  logo_url text,
+  banner_url text,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+ALTER TABLE public.labels ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Qualquer pessoa vê as labels públicas" ON public.labels FOR SELECT USING (true);
+CREATE POLICY "Organizadores gerem a sua própria label" ON public.labels FOR ALL USING (auth.uid() = owner_id);
+
+-- 2. Adicionar colunas novas à tabela expenses existente
+ALTER TABLE public.expenses ADD COLUMN IF NOT EXISTS is_paid boolean default false;
+ALTER TABLE public.expenses ADD COLUMN IF NOT EXISTS paid_by text;
+
+```
+
 ## 1.2 Hugging Face
 
 Criei conta na Hugging face, que é um "github" das IA, onde existem vários modelos de IA's disponiveis para serem usados por devs, o meu objetivo é usar um modelo de NLP pronto
@@ -461,3 +545,5 @@ criei token com opção de READ e adicionei ao .env
 Como as políticas de RLS estão ativas, não conseguirás testar as tabelas de eventos ou bilhetes sem um utilizador autenticado.
 
 npm install zustand
+
+#### Estudar melhor sobre os pagamentos para meter no relatório

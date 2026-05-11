@@ -20,8 +20,9 @@ router.get('/my', verifyToken, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('tickets')
-      .select('*, events(name, date, location)')
-      .eq('user_id', req.user.id);  // Filtro: só os bilhetes DESTE user
+      .select('*, events(name, date, location, image_url, slug), ticket_types(name, price, description)')
+      .eq('user_id', req.user.id)
+      .order('purchased_at', { ascending: false });
 
     if (error) throw error;
     res.json(data);

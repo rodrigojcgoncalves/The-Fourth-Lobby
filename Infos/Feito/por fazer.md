@@ -98,24 +98,24 @@ Esta secção organiza as tuas metas de forma técnica para execução.
 
 ### 3.1 Segurança e Core Fixes
 
-- [ ] **RBAC (Role-Based Access Control):** Bloquear rotas sensíveis de Organizador/Promoter para utilizadores sem permissão.
-- [ ] **Páginas Dinâmicas:** Transformar Checkout e "My Tickets" em páginas funcionais (dados reais do DB).
-- [ ] **Descrições de Bilhetes:** Garantir que a descrição personalizada aparece na página do evento.
-- [ ] **Privacidade de Stock:** Ocultar o número exato de bilhetes restantes na vista de compra.
+- [x] **RBAC (Role-Based Access Control):** Bloquear rotas sensíveis de Organizador/Promoter para utilizadores sem permissão.
+- [x] **Páginas Dinâmicas:** Transformar Checkout e "My Tickets" em páginas funcionais (dados reais do DB).
+- [x] **Descrições de Bilhetes:** Garantir que a descrição personalizada aparece na página do evento.
+- [x] **Privacidade de Stock:** Ocultar o número exato de bilhetes restantes na vista de compra.
 
 ### 3.2 Módulo do Organizador (Label Management)
 
-- [ ] **Sidebar Administrativa:** Acesso rápido a Eventos, Equipa de RPs e Perfil da Organização.
-- [ ] **Página de Detalhes do Evento (Interna):**
+- [x] **Sidebar Administrativa:** Acesso rápido a Eventos, Equipa de RPs e Perfil da Organização.
+- [x] **Página de Detalhes do Evento (Interna):**
   - Abas/Menu para: **Editar Evento**, **Estatísticas (NLP)**, **Gestão de RPs**, **Artistas**, **Bilhetes**, **Despesas** e **Check-in/Scan**.
 - [ ] **Gestão Financeira (Despesas):** Sistema para adicionar despesas (nome, valor, estado de pagamento, responsável) com cálculo de balanço total.
 - [ ] **Configuração de RPs:** Toggle de comissão (%), definição de descontos por promocode.
 - [ ] **Perfil da Label (`/label/:slug`):** Banner, logo, bio e histórico público de eventos/artistas.
-- [ ] **Validação Visual:** Imagens em 16:9 e controlos de visibilidade (Public/Private) por evento e fase.
+- [x] **Validação Visual:** Imagens em 16:9 e controlos de visibilidade (Public/Private) por evento e fase.
 
 ### 3.3 Check-in e Bilhética
 
-- [ ] **QR Code Unificado:** Gerar um código QR único por bilhete vendido.
+- [x] **QR Code Unificado:** Gerar um código QR único por bilhete vendido.
 - [ ] **Ferramenta de Scan:** Implementar a lógica de leitura na entrada do evento (marcar bilhete como "Usado" no DB).
 
 ### 3.4 Experiência do Promotor (RP)
@@ -130,8 +130,8 @@ Esta secção organiza as tuas metas de forma técnica para execução.
 
 ### 3.6 Interface Global
 
-- [ ] **Uniformização:** Aplicar o esquema de cores e Glassmorphism de forma profissional em todo o site.
-- [ ] **Search Bar:** Ajustar para um formato mais fino e elegante.
+- [x] **Uniformização:** Aplicar o esquema de cores e Glassmorphism de forma profissional em todo o site.
+- [x] **Search Bar:** Ajustar para um formato mais fino e elegante.
 
 ## 4. Sugestões de Melhoria (Antigravity)
 

@@ -2,7 +2,6 @@ import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
-// Definimos o que o componente espera receber
 interface ProtectedRouteProps {
     children: ReactNode;
     allowedRoles?: ('customer' | 'promoter' | 'organizer')[];
@@ -13,22 +12,24 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     const role = useAuthStore((state) => state.role);
     const loading = useAuthStore((state) => state.loading);
 
+    // 1. Aguardar inicialização da store (evita redirecionamento prematuro)
     if (loading) {
-    return (
-        <div className="flex h-screen items-center justify-center">
-        <p>A carregar permissões...</p>
-        </div>
-    );
+        return (
+            <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a' }}>
+                <p style={{ color: '#00d4ff', opacity: 0.7 }}>A validar sessão...</p>
+            </div>
+        );
     }
 
-  // Se não está logado, vai para o login
+    // 2. Não autenticado → /login
     if (!user) {
-    return <Navigate to="/login" replace />;
+        return <Navigate to="/login" replace />;
     }
 
-  // Se o role do utilizador não estiver na lista permitida
+    // 3. Autenticado mas sem permissão para esta rota → homepage
     if (allowedRoles && !allowedRoles.includes(role as any)) {
-    return <Navigate to="/" replace />;
+        console.warn(`[RBAC] Utilizador '${user.email}' (${role}) sem permissão para rota restrita a [${allowedRoles.join(', ')}].`);
+        return <Navigate to="/" replace />;
     }
 
     return <>{children}</>;

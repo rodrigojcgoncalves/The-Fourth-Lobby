@@ -15,7 +15,8 @@ import CalculatorPage from './pages/CalculatorPage';
 import SuccessPage from './pages/SuccessPage';
 import NotFound from './pages/NotFound';
 import { ProtectedRoute } from './components/ProtectedRoute';
-
+import OrganizerLayout from './components/layout/OrganizerLayout';
+import InternalEventDetailsPage from './pages/InternalEventDetailsPage';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -37,15 +38,19 @@ export const router = createBrowserRouter([
       // Rotas Protegidas - Organizador
       { 
         path: 'organizer', 
-        element: <ProtectedRoute allowedRoles={['organizer']}><OrganizerDashboard /></ProtectedRoute> 
+        element: <ProtectedRoute allowedRoles={['organizer']}><OrganizerLayout /></ProtectedRoute>,
+        children: [
+          { index: true, element: <OrganizerDashboard /> },
+          { path: 'events/:id', element: <InternalEventDetailsPage /> }, // Será criado a seguir
+          { path: 'edit-event/:id', element: <EditEventPage /> },
+          { path: 'team', element: <div style={{padding: '2rem'}}>Equipa RPs (Brevemente)</div> },
+          { path: 'label', element: <div style={{padding: '2rem'}}>Perfil da Label (Brevemente)</div> },
+        ]
       },
+      // Estas rotas ficam for de /organizer/ (ou podiam estar dentro, mas para não quebrar links existentes deixamos fora, exeto edit-event)
       { 
         path: 'create-event', 
         element: <ProtectedRoute allowedRoles={['organizer']}><CreateEventPage /></ProtectedRoute> 
-      },
-      { 
-        path: 'organizer/edit-event/:id', 
-        element: <ProtectedRoute allowedRoles={['organizer']}><EditEventPage /></ProtectedRoute> 
       },
       { 
         path: 'calculator', 

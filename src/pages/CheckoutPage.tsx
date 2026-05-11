@@ -1,206 +1,165 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './CheckoutPage.css';
+
+interface CheckoutState {
+  ticketTypeId: string;
+  ticketTypeName: string;
+  ticketTypeDescription?: string;
+  price: number;
+  eventName: string;
+  eventDate: string;
+  eventLocation: string;
+  quantity?: number;
+}
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const [paymentMethod, setPaymentMethod] = useState('card');
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    zipCode: ''
-  });
+  const location = useLocation();
+  const state = location.state as CheckoutState | null;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const [quantity, setQuantity] = useState(state?.quantity || 1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Se não veio estado de navegação, é acesso direto (URL bar)
+  if (!state) {
+    return (
+      <div className="container checkout-page">
+        <div style={{ paddingTop: '4rem', textAlign: 'center' }}>
+          <h2>Nenhum bilhete selecionado</h2>
+          <p style={{ color: 'rgba(255,255,255,0.5)', margin: '1rem 0' }}>
+            Escolhe um evento e seleciona uma fase de bilhetes para prosseguir.
+          </p>
+          <button className="btn-primary" onClick={() => navigate('/')}>Ver Eventos</button>
+        </div>
+      </div>
+    );
+  }
+
+  const total = (state.price * quantity).toFixed(2);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate payment processing
-    alert('Payment processed successfully!');
-    navigate('/success');
+    setLoading(true);
+    setError(null);
+
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+      setError('Sessão expirada. Faz login novamente.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:5000/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ticket_type_id: state.ticketTypeId,
+          quantity
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Erro ao processar compra.');
+
+      // Sucesso → redirecionar para a página de confirmação
+      navigate('/success', {
+        state: {
+          orderId: data.order.id,
+          tickets: data.order.tickets,
+          eventName: state.eventName,
+          total: data.order.total_amount
+        }
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro desconhecido.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="container checkout-page">
       <div className="checkout-wrapper">
+        {/* Formulário */}
         <div className="checkout-form-section">
-          <h1>Checkout</h1>
+          <h1>Confirmar Compra</h1>
 
+          {/* Resumo */}
           <div className="order-summary">
-            <h3>Order Summary</h3>
+            <h3>Resumo da Encomenda</h3>
             <div className="summary-item">
-              <span>DIMENSION IV Ticket (Early Bird)</span>
-              <span>€45.00</span>
+              <span>{state.ticketTypeName}</span>
+              <span>€{Number(state.price).toFixed(2)} / bilhete</span>
             </div>
+            {state.ticketTypeDescription && (
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', margin: '0.5rem 0' }}>
+                {state.ticketTypeDescription}
+              </p>
+            )}
             <div className="summary-item">
-              <span>Service Fee</span>
-              <span>€2.50</span>
+              <span>Quantidade</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: 28, height: 28, borderRadius: 4, cursor: 'pointer' }}
+                >−</button>
+                <span style={{ minWidth: 20, textAlign: 'center' }}>{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity(q => Math.min(10, q + 1))}
+                  style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: 28, height: 28, borderRadius: 4, cursor: 'pointer' }}
+                >+</button>
+              </div>
             </div>
             <div className="summary-total">
               <span>Total:</span>
-              <span>€47.50</span>
+              <span>€{total}</span>
             </div>
           </div>
+
+          {error && <div className="form-error" style={{ marginBottom: '1rem' }}>{error}</div>}
 
           <form onSubmit={handleSubmit} className="checkout-form">
-            {/* Personal Info */}
-            <fieldset>
-              <legend>Personal Information</legend>
-              <div className="form-group">
-                <label htmlFor="fullName">Full Name</label>
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="John Doe"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="john@example.com"
-                />
-              </div>
-            </fieldset>
-
-            {/* Payment Method Selection */}
-            <fieldset>
-              <legend>Payment Method</legend>
-              <div className="payment-methods">
-                <label className="payment-method-label">
-                  <input
-                    type="radio"
-                    value="card"
-                    checked={paymentMethod === 'card'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <span>Credit Card</span>
-                </label>
-                <label className="payment-method-label">
-                  <input
-                    type="radio"
-                    value="paypal"
-                    checked={paymentMethod === 'paypal'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <span>PayPal</span>
-                </label>
-                <label className="payment-method-label">
-                  <input
-                    type="radio"
-                    value="bank"
-                    checked={paymentMethod === 'bank'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <span>Bank Transfer</span>
-                </label>
-              </div>
-            </fieldset>
-
-            {/* Card Details */}
-            {paymentMethod === 'card' && (
-              <fieldset>
-                <legend>Card Details</legend>
-                <div className="form-group">
-                  <label htmlFor="cardNumber">Card Number</label>
-                  <input
-                    type="text"
-                    id="cardNumber"
-                    name="cardNumber"
-                    value={formData.cardNumber}
-                    onChange={handleInputChange}
-                    placeholder="4532 1234 5678 9010"
-                    maxLength={19}
-                  />
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="expiryDate">Expiry Date</label>
-                    <input
-                      type="text"
-                      id="expiryDate"
-                      name="expiryDate"
-                      value={formData.expiryDate}
-                      onChange={handleInputChange}
-                      placeholder="MM/YY"
-                      maxLength={5}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="cvv">CVV</label>
-                    <input
-                      type="text"
-                      id="cvv"
-                      name="cvv"
-                      value={formData.cvv}
-                      onChange={handleInputChange}
-                      placeholder="123"
-                      maxLength={3}
-                    />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="zipCode">Zip Code</label>
-                  <input
-                    type="text"
-                    id="zipCode"
-                    name="zipCode"
-                    value={formData.zipCode}
-                    onChange={handleInputChange}
-                    placeholder="4000-000"
-                  />
-                </div>
-              </fieldset>
-            )}
-
-            <button type="submit" className="btn-primary checkout-button">
-              Complete Purchase - €47.50
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              🔒 O teu bilhete será emitido imediatamente após a confirmação.
+            </p>
+            <button type="submit" className="btn-primary checkout-button" disabled={loading}>
+              {loading ? 'A processar...' : `✓ Confirmar Compra — €${total}`}
+            </button>
+            <button type="button" className="btn-secondary" style={{ marginTop: '0.75rem', width: '100%' }} onClick={() => navigate(-1)}>
+              ← Voltar
             </button>
           </form>
-
-          <p className="secure-badge">
-            🔒 Your payment is secure and encrypted
-          </p>
         </div>
 
-        {/* Sidebar Info */}
+        {/* Sidebar com detalhes do evento */}
         <aside className="checkout-sidebar">
           <div className="sidebar-card">
-            <h3>Event Details</h3>
+            <h3>Detalhes do Evento</h3>
             <div className="event-info-item">
-              <span className="label">Event</span>
-              <span className="value">DIMENSION IV: The Awakening</span>
+              <span className="label">Evento</span>
+              <span className="value">{state.eventName}</span>
             </div>
             <div className="event-info-item">
-              <span className="label">Date</span>
-              <span className="value">Apr 15, 2026</span>
+              <span className="label">Data</span>
+              <span className="value">
+                {new Date(state.eventDate).toLocaleDateString('pt-PT', { weekday: 'short', day: 'numeric', month: 'long' })}
+              </span>
             </div>
             <div className="event-info-item">
-              <span className="label">Location</span>
-              <span className="value">Warehouse District, Porto</span>
+              <span className="label">Local</span>
+              <span className="value">{state.eventLocation}</span>
             </div>
-          </div>
-
-          <div className="sidebar-card">
-            <h3>Have a Promo Code?</h3>
-            <div className="promo-input">
-              <input type="text" placeholder="Enter code" />
-              <button type="button" className="btn-small">Apply</button>
+            <div className="event-info-item">
+              <span className="label">Fase</span>
+              <span className="value">{state.ticketTypeName}</span>
             </div>
           </div>
         </aside>

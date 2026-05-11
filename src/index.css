@@ -1,13 +1,30 @@
 /* Global Styles */
 :root {
-  --neon-cyan: #00D4FF;
-  --neon-magenta: #FF00FF;
-  --background: #0a0a0a;
-  --glass-bg: rgba(20, 20, 30, 0.6);
-  --glass-border: rgba(0, 212, 255, 0.2);
-  --card-background: rgba(30, 30, 45, 0.8);
-  --input-background: rgba(50, 50, 70, 0.5);
-  --destructive: #FF1744;
+  /* ── Paleta Principal (Customer / Site Geral) ─────────────────────────── */
+  --primary:        #E01B24;      /* Vermelho escuro vibrante */
+  --primary-dim:    rgba(224, 27, 36, 0.15);
+  --primary-glow:   rgba(224, 27, 36, 0.35);
+  --primary-border: rgba(224, 27, 36, 0.25);
+
+  /* ── Paleta Organizador (Roxo escuro) ─────────────────────────────────── */
+  --org-primary:        #7C3AED;  /* Roxo Violeta */
+  --org-primary-dim:    rgba(124, 58, 237, 0.15);
+  --org-primary-glow:   rgba(124, 58, 237, 0.35);
+  --org-primary-border: rgba(124, 58, 237, 0.25);
+
+  /* ── Compatibilidade (variáveis antigas apontam para as novas) ─────────── */
+  --neon-cyan:    var(--primary);
+  --neon-magenta: #c0392b;        /* Vermelho mais fundo para acentos */
+
+  /* ── Fundo e Glassmorphism ───────────────────────────────────────────── */
+  --background:        #0a0a0c;
+  --glass-bg:          rgba(18, 10, 10, 0.65);
+  --glass-border:      var(--primary-border);
+  --card-background:   rgba(28, 14, 14, 0.8);
+  --input-background:  rgba(45, 20, 20, 0.5);
+
+  /* ── Utilitários ─────────────────────────────────────────────────────── */
+  --destructive: #ff1744;
   --radius: 8px;
 }
 
@@ -20,7 +37,7 @@
 body {
   background-color: var(--background);
   color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -36,19 +53,21 @@ body {
 /* Buttons */
 .btn-primary {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+  background: linear-gradient(135deg, var(--primary), #9b1a20);
   border: none;
   border-radius: var(--radius);
-  color: #000;
+  color: #fff;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 10px 25px var(--primary-glow);
 }
 
 .btn-primary:active {
@@ -57,7 +76,7 @@ body {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -65,18 +84,18 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--neon-cyan);
+  background: rgba(224, 27, 36, 0.4);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-magenta);
+  background: var(--primary);
 }
 
 /* Selection */
 ::selection {
-  background: var(--neon-cyan);
-  color: #000;
+  background: var(--primary-dim);
+  color: #fff;
 }
 
 /* Input Focus */

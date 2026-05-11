@@ -56,15 +56,9 @@ export default function OrganizerDashboard() {
   const draftCount = events.filter(e => e.status === 'draft').length;
 
   return (
-    <div className="container dashboard">
-      <div className="dashboard-header">
-        <h1>Organizer Dashboard</h1>
-        <button
-          className="btn-primary"
-          onClick={() => navigate('/create-event')}
-        >
-          + Criar Evento
-        </button>
+    <div className="dashboard-view">
+      <div className="dashboard-header-simple">
+        <h2>Visão Geral dos Eventos</h2>
       </div>
 
       {error && <div className="form-error">{error}</div>}
@@ -93,18 +87,9 @@ export default function OrganizerDashboard() {
             <p className="stat-value">{draftCount}</p>
           </div>
         </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">🎫</div>
-          <div className="stat-content">
-            <p className="stat-label">Bilhetes Vendidos</p>
-            <p className="stat-value">—</p>
-          </div>
-        </div>
       </div>
 
       <section className="dashboard-section">
-        <h2>Os Meus Eventos</h2>
         {loading ? (
           <p style={{ color: 'rgba(255,255,255,0.5)' }}>A carregar os teus eventos...</p>
         ) : events.length === 0 ? (
@@ -119,7 +104,6 @@ export default function OrganizerDashboard() {
             <thead>
               <tr>
                 <th>Evento</th>
-                <th>Local</th>
                 <th>Data</th>
                 <th>Capacidade</th>
                 <th>Estado</th>
@@ -137,7 +121,6 @@ export default function OrganizerDashboard() {
                       <span>{event.name}</span>
                     </div>
                   </td>
-                  <td>{event.location}</td>
                   <td>{new Date(event.date).toLocaleDateString('pt-PT')}</td>
                   <td>{event.capacity}</td>
                   <td>
@@ -148,19 +131,19 @@ export default function OrganizerDashboard() {
                   <td>
                     <div className="action-buttons">
                       <button
-                        className="btn-action btn-edit"
-                        onClick={() => navigate(`/organizer/edit-event/${event.id}`)}
-                        title="Editar evento"
+                        className="btn-action btn-view"
+                        onClick={() => navigate(`/organizer/events/${event.id}`)}
+                        title="Gerir Evento (Dashboard Interno)"
                       >
-                        ✏️ Editar
+                        ⚙️ Gerir
                       </button>
                       {event.slug && (
                         <button
-                          className="btn-action btn-view"
+                          className="btn-action btn-secondary"
                           onClick={() => navigate(`/events/${event.slug}`)}
                           title="Ver página pública"
                         >
-                          👁 Ver
+                          👁 Público
                         </button>
                       )}
                       <button

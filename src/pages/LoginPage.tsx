@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useAuthStore } from '../store/authStore';
+import logoIcon from '@img/fourthdimension_logo.png';
 import './LoginPage.css';
 
 export default function LoginPage() {
@@ -65,7 +66,8 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-container">
         <div className="login-card">
-          <h1>The Fourth Lobby</h1>
+          <img src={logoIcon} alt="The Fourth Lobby" className="login-logo" />
+          <p className="login-subtitle">The Fourth Lobby</p>
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-tabs">
@@ -185,17 +187,6 @@ export default function LoginPage() {
             )}
           </div>
 
-          <div className="divider">OR</div>
-
-          <div className="social-login">
-            <button type="button" className="social-btn" disabled={loading}>
-              <span>Continue with Google</span>
-            </button>
-            <button type="button" className="social-btn" disabled={loading}>
-              <span>Continue with Discord</span>
-            </button>
-          </div>
-
           <p className="login-note">
             {isLogin
               ? "Don't have an account? "
@@ -209,21 +200,6 @@ export default function LoginPage() {
               {isLogin ? 'Register' : 'Login'}
             </button>
           </p>
-        </div>
-
-        <div className="login-info">
-          <div className="info-card">
-            <h3>🎵 Experience Techno</h3>
-            <p>Discover the hardest beats and darkest nights with The Fourth Lobby</p>
-          </div>
-          <div className="info-card">
-            <h3>🎫 Easy Ticketing</h3>
-            <p>Purchase tickets securely and manage your events in one place</p>
-          </div>
-          <div className="info-card">
-            <h3>👥 Community</h3>
-            <p>Join thousands of techno enthusiasts from around the world</p>
-          </div>
         </div>
       </div>
     </div>

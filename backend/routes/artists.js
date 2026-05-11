@@ -35,9 +35,9 @@ router.post('/upload', verifyToken, requireRole('organizer'), upload.single('ima
     const fileExt = req.file.originalname.split('.').pop();
     const fileName = `artists/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
     
-    // Usar o bucket EVENT-IMAGES (nome exacto como criado no Supabase dashboard)
+    // Usar o bucket event-images (nome exacto como criado no Supabase dashboard)
     const { error } = await supabase.storage
-      .from('EVENT-IMAGES')
+      .from('event-images')
       .upload(fileName, req.file.buffer, {
         contentType: req.file.mimetype,
         upsert: false
@@ -46,7 +46,7 @@ router.post('/upload', verifyToken, requireRole('organizer'), upload.single('ima
     if (error) throw error;
 
     const { data: publicUrlData } = supabase.storage
-      .from('EVENT-IMAGES')
+      .from('event-images')
       .getPublicUrl(fileName);
 
     res.status(200).json({ 

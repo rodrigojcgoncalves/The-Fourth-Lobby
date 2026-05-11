@@ -67,11 +67,11 @@
   letter-spacing: 0.03em;
 }
 
-/* Botão coral/vermelho do Hero */
+/* Botão vermelho do Hero */
 .btn-hero {
   margin-top: 0.5rem;
   padding: 0.85rem 2.5rem;
-  background: #e8453c;
+  background: var(--primary);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
@@ -83,9 +83,9 @@
 }
 
 .btn-hero:hover {
-  background: #c73d34;
+  background: #c0171f;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(232, 69, 60, 0.45);
+  box-shadow: 0 8px 24px var(--primary-glow);
 }
 
 /* ══════════════════════════════════════
@@ -99,6 +99,19 @@
 
 .home-section {
   padding: 3.5rem 0;
+  position: relative;
+}
+
+/* Separador visual entre secções */
+.home-section + .home-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary-border), transparent);
 }
 
 .section-title {
@@ -107,6 +120,9 @@
   color: #ffffff;
   margin: 0 0 2rem;
   letter-spacing: 0.01em;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--primary);
+  display: inline-block;
 }
 
 .loading-text {
@@ -169,7 +185,7 @@
   top: 0.6rem;
   left: 0.75rem;
   background: rgba(0, 0, 0, 0.65);
-  color: #8b5cf6;
+  color: var(--primary);
   padding: 0.2rem 0.55rem;
   border-radius: 4px;
   font-size: 0.7rem;
@@ -186,7 +202,7 @@
   margin: 0 0 0.3rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #8b5cf6;
+  color: var(--primary);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }

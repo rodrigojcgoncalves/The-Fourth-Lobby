@@ -1,12 +1,40 @@
 /* Header Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .header {
   position: sticky;
   top: 0;
   z-index: 100;
   background: rgba(0, 0, 0, 0.92);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: none;
   padding: 0.65rem 0;
+}
+
+/* Quando estamos numa rota do Organizador, o header adopta a cor roxa */
+.header--organizer {
+  --primary: var(--org-primary);
+  --primary-dim: var(--org-primary-dim);
+  --primary-glow: var(--org-primary-glow);
+  --primary-border: var(--org-primary-border);
+}
+
+/* Linha vermelha animada no fundo do header */
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0.6;
+  animation: headerPulse 4s ease-in-out infinite;
+}
+
+@keyframes headerPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
 }
 
 .header-content {
@@ -43,18 +71,24 @@
 
 .search-container {
   flex: 1;
-  max-width: 400px;
+  max-width: 360px;
 }
 
 .search-bar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: var(--input-background);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius);
-  color: var(--neon-cyan);
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;   /* Mais fino que os anteriores 0.75rem */
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;       /* Pill shape — mais elegante */
+  color: rgba(255, 255, 255, 0.4);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.search-bar:focus-within {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .search-bar input {
@@ -63,10 +97,12 @@
   border: none;
   color: #fff;
   outline: none;
+  font-size: 0.875rem;
 }
 
 .search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.875rem;
 }
 
 .nav-links {
@@ -102,19 +138,21 @@
 }
 
 .btn-login {
-  padding: 0.5rem 1.2rem;
-  background: #fff;
-  border: none;
-  border-radius: 5px;
-  color: #000;
-  font-weight: 700;
-  font-size: 0.875rem;
+  padding: 0.45rem 1.1rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-login:hover {
-  background: #e0e0e0;
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-dim);
 }
 
 /* Footer Styles */

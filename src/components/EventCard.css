@@ -10,12 +10,14 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .event-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 8px 30px rgba(224, 27, 36, 0.2);
+  border-color: rgba(224, 27, 36, 0.3);
 }
 
 /* ── Imagem do poster ── */
@@ -75,12 +77,12 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* ── Botão "View Event" roxo, full-width ── */
+/* ── Botão "View Event" vermelho, full-width ── */
 .btn-view-event {
   margin-top: auto;
   width: 100%;
   padding: 0.75rem;
-  background: #8b5cf6;
+  background: var(--primary);
   color: #ffffff;
   font-size: 0.9rem;
   font-weight: 600;
@@ -88,10 +90,11 @@
   border-radius: 6px;
   cursor: pointer;
   letter-spacing: 0.03em;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-view-event:hover {
-  background: #7c3aed;
+  background: #c0171f;
   transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(224, 27, 36, 0.3);
 }

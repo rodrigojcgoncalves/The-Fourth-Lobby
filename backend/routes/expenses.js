@@ -61,7 +61,7 @@ router.post('/event/:eventId', verifyToken, requireRole('organizer'), async (req
       return res.status(403).json({ message: 'Não tens permissão para adicionar despesas a este evento.' });
     }
 
-    const { description, category, amount, date } = req.body;
+    const { description, category, amount, date, is_paid = false, paid_by = null } = req.body;
 
     const { data, error } = await supabase
       .from('expenses')
@@ -70,7 +70,9 @@ router.post('/event/:eventId', verifyToken, requireRole('organizer'), async (req
         description,
         category,
         amount,
-        date
+        date,
+        is_paid,
+        paid_by
       }])
       .select()
       .single();
@@ -79,6 +81,37 @@ router.post('/event/:eventId', verifyToken, requireRole('organizer'), async (req
     res.status(201).json({ message: 'Despesa adicionada!', expense: data });
   } catch (err) {
     res.status(500).json({ message: 'Erro ao adicionar despesa.', error: err.message });
+  }
+});
+
+// PATCH /api/expenses/:id/toggle-paid - Alternar estado pago/pendente
+router.patch('/:id/toggle-paid', verifyToken, requireRole('organizer'), async (req, res) => {
+  try {
+    const { data: expense } = await supabase
+      .from('expenses')
+      .select('event_id, is_paid')
+      .eq('id', req.params.id)
+      .single();
+
+    if (!expense) return res.status(404).json({ message: 'Despesa não encontrada.' });
+
+    const isOwner = await verifyEventOwnership(expense.event_id, req.user.id);
+    if (!isOwner) return res.status(403).json({ message: 'Sem permissão.' });
+
+    const { paid_by } = req.body;
+    const newIsPaid = !expense.is_paid;
+
+    const { data, error } = await supabase
+      .from('expenses')
+      .update({ is_paid: newIsPaid, paid_by: newIsPaid ? (paid_by || null) : null })
+      .eq('id', req.params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ message: newIsPaid ? 'Marcada como paga.' : 'Marcada como pendente.', expense: data });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao atualizar estado.', error: err.message });
   }
 });
 

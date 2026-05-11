@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User } from '../../types';
 import './Header.css';
 
@@ -12,9 +12,20 @@ interface HeaderProps {
 
 export default function Header({ currentUser, onLogout }: HeaderProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isOrganizerView = location.pathname.startsWith('/organizer') || location.pathname.startsWith('/create-event');
+
+  let formattedName = '';
+  if (currentUser) {
+    const displayName = currentUser.fullName || currentUser.email?.split('@')[0] || '';
+    formattedName = displayName
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
 
   return (
-    <header className="header">
+    <header className={`header ${isOrganizerView ? 'header--organizer' : ''}`}>
       <div className="header-content">
 
         {/* ── Logo (Esquerda) ── */}
@@ -67,7 +78,7 @@ export default function Header({ currentUser, onLogout }: HeaderProps) {
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
-                {currentUser.fullName || currentUser.email?.split('@')[0]}
+                {formattedName}
               </button>
               <button className="btn-login" onClick={onLogout}>
                 Logout

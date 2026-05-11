@@ -80,12 +80,12 @@ export default function EditEventPage() {
           setPhases(data.ticket_types.map((t: any) => ({
             id: t.id,
             name: t.name,
-            description: '',
+            description: t.description || '',   // ← corrigido: ler do DB
             price: t.price,
             quantity: t.total_quantity
           })));
         } else {
-          setPhases([{ id: '1', name: 'Fase Geral', description: '', price: 10, quantity: 100 }]);
+          setPhases([{ id: crypto.randomUUID(), name: 'Fase Geral', description: '', price: 10, quantity: 100 }]);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro ao carregar evento.');
@@ -135,7 +135,7 @@ export default function EditEventPage() {
   };
 
   // Fases handlers
-  const addPhase = () => setPhases([...phases, { id: Math.random().toString(), name: '', description: '', price: 0, quantity: 0 }]);
+  const addPhase = () => setPhases([...phases, { id: `new-${Date.now()}`, name: '', description: '', price: 0, quantity: 0 }]);
   const updatePhase = (phaseId: string, field: keyof TicketPhase, value: string | number) =>
     setPhases(phases.map(p => p.id === phaseId ? { ...p, [field]: value } : p));
   const removePhase = (phaseId: string) => setPhases(phases.filter(p => p.id !== phaseId));
@@ -221,6 +221,7 @@ export default function EditEventPage() {
         image_url: uploadedImageUrl,
         status,
         phases: phases.map(p => ({
+          id: p.id,        // ← corrigido: incluir o ID para o backend identificar fases existentes
           name: p.name,
           description: p.description,
           price: Number(p.price),

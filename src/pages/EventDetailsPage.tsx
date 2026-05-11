@@ -56,8 +56,18 @@ export default function EventDetailsPage() {
     );
   }
 
-  const handleBuyTickets = () => {
-    navigate('/checkout');
+  const handleBuyTickets = (phase: any) => {
+    navigate('/checkout', {
+      state: {
+        ticketTypeId: phase.id,
+        ticketTypeName: phase.name,
+        ticketTypeDescription: phase.description,
+        price: phase.price,
+        eventName: event!.name,
+        eventDate: event!.date,
+        eventLocation: event!.location
+      }
+    });
   };
 
   return (
@@ -130,33 +140,34 @@ export default function EventDetailsPage() {
           <h2>Comprar Bilhetes</h2>
           {event.ticket_types && event.ticket_types.length > 0 ? (
             <div className="ticket-phases">
-              {event.ticket_types.map(phase => {
-                const available = phase.total_quantity - phase.sold_quantity;
-                // Simplificado: fase está ativa se tiver bilhetes disponíveis
-                const isActive = available > 0;
-                
+              {event.ticket_types.map((phase: any) => {
+                // A API pública retorna 'availability' (string) em vez de quantidades
+                const isAvailable = phase.availability
+                  ? phase.availability === 'Disponível'
+                  : (phase.total_quantity - phase.sold_quantity) > 0;
+
                 return (
                   <div key={phase.id} className="ticket-phase-card">
                     <div className="phase-header">
                       <h3>{phase.name}</h3>
-                      {isActive ? (
+                      {isAvailable ? (
                         <span className="badge-active">DISPONÍVEL</span>
                       ) : (
                         <span className="badge-inactive">ESGOTADO</span>
                       )}
                     </div>
+                    {phase.description && (
+                      <p className="phase-description">{phase.description}</p>
+                    )}
                     <div className="phase-details">
                       <p className="price">€{Number(phase.price).toFixed(2)}</p>
-                      <p className="availability">
-                        {available} de {phase.total_quantity} disponíveis
-                      </p>
                     </div>
-                    <button 
+                    <button
                       className="btn-primary"
-                      onClick={handleBuyTickets}
-                      disabled={!isActive || available === 0}
+                      onClick={() => handleBuyTickets(phase)}
+                      disabled={!isAvailable}
                     >
-                      {available === 0 ? 'Esgotado' : 'Comprar Bilhete'}
+                      {isAvailable ? 'Comprar Bilhete' : 'Esgotado'}
                     </button>
                   </div>
                 );
