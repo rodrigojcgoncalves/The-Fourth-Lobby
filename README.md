@@ -1,6 +1,6 @@
 # The Fourth Lobby
 
-Plataforma de bilhética e gestão de eventos de música eletrónica, desenvolvida como projeto final de curso. O sistema suporta o ciclo completo de um evento — desde a criação e venda de bilhetes até ao check-in de participantes e controlo financeiro.
+Sistema B2B ("White-Label") de bilhética e gestão de eventos de música eletrónica, desenhado nativamente para ser a plataforma exclusiva da label **Fourth Dimension**. O sistema suporta o ciclo completo de um evento — desde a gestão de RPs/Promotores e a venda de bilhetes com descontos de afiliados, até ao check-in de participantes (QR Code) e controlo financeiro.
 
 ---
 
@@ -21,6 +21,7 @@ Frontend (React/Vite) → API REST (Node.js/Express) → Supabase (PostgreSQL)
 |---|---|
 | React 18 + TypeScript | Framework de UI |
 | Vite | Build tool e servidor de desenvolvimento |
+| Vitest + RTL | Testes Unitários e de Integração |
 | React Router v6 | Routing client-side |
 | Zustand | Gestão de estado global |
 | qrcode.react | Geração de QR Codes para bilhetes |
@@ -30,6 +31,7 @@ Frontend (React/Vite) → API REST (Node.js/Express) → Supabase (PostgreSQL)
 | Tecnologia | Função |
 |---|---|
 | Node.js + Express | Servidor REST API |
+| Jest + Supertest | Testes Unitários e de Integração da API |
 | Supabase JS SDK | Cliente de base de dados (PostgreSQL) |
 | Supabase Storage | Upload de imagens |
 | JSON Web Tokens | Autenticação |
@@ -83,6 +85,16 @@ npm run dev
 # Backend (porta 5000)
 cd backend
 node server.js
+```
+
+### 4. Executar os Testes Unitários
+
+O projeto utiliza um paradigma *Test Driven Development* (TDD) para estabilidade a longo prazo.
+
+```bash
+# Testes do Backend (Jest)
+cd backend
+npm test
 ```
 
 ---
@@ -140,6 +152,8 @@ O controlo de acessos é aplicado no backend via middleware. São suportados tr�
 | POST | `/api/events/:id/upload-image` | Organizador | Upload de capa do evento |
 | GET | `/api/tickets/my` | Cliente | Consultar bilhetes próprios |
 | POST | `/api/tickets/purchase` | Cliente | Comprar bilhete |
+| GET | `/api/promoters/verify/:code` | Cliente Autenticado | Verifica a validade de um código de desconto de RP |
+| GET | `/api/promoters/dashboard` | Promotor | Dashboard com métricas de vendas, comissões ganhas e eventos da sua label |
 | GET | `/api/expenses/event/:id` | Organizador | Listar despesas de um evento |
 | POST | `/api/expenses/event/:id` | Organizador | Adicionar despesa |
 | PATCH | `/api/expenses/:id/toggle-paid` | Organizador | Alternar estado pago/pendente |

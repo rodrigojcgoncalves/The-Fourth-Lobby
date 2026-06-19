@@ -26,7 +26,7 @@ function generateQRCode() {
 
 // POST /api/orders - Criar uma encomenda completa
 router.post('/', verifyToken, async (req, res) => {
-  const { ticket_type_id, quantity = 1 } = req.body;
+  const { ticket_type_id, quantity = 1, referral_code } = req.body;
 
   if (!ticket_type_id) {
     return res.status(400).json({ message: 'ticket_type_id é obrigatório.' });
@@ -68,7 +68,28 @@ router.post('/', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'Detalhes da fase de bilhete não encontrados.' });
     }
 
-    const totalAmount = parseFloat((ticketType.price * quantity).toFixed(2));
+    let discountPercent = 0;
+    let promoterId = null;
+    let commissionRate = 0;
+
+    // Verificar o Promocode
+    if (referral_code) {
+      const { data: promoter } = await supabase
+        .from('promoters')
+        .select('id, commission_rate')
+        .eq('referral_code', referral_code)
+        .single();
+        
+      if (promoter) {
+        discountPercent = 10; // Ponytail Mode: 10% fixo para o cliente
+        promoterId = promoter.id;
+        commissionRate = parseFloat(promoter.commission_rate || 0);
+      }
+    }
+
+    const basePrice = parseFloat(ticketType.price);
+    const pricePaid = parseFloat((basePrice * (1 - discountPercent / 100)).toFixed(2));
+    const totalAmount = parseFloat((pricePaid * quantity).toFixed(2));
 
     // ── PASSO 2: Criar a Order ──────────────────────────────────────────────
     const { data: order, error: orderError } = await supabase
@@ -101,7 +122,7 @@ router.post('/', verifyToken, async (req, res) => {
       event_id: ticketType.event_id,
       ticket_type_id: ticket_type_id,
       order_id: orderId,
-      price_paid: parseFloat(ticketType.price),
+      price_paid: pricePaid,
       status: 'valid',
       qr_code: generateQRCode()
     }));
@@ -114,7 +135,24 @@ router.post('/', verifyToken, async (req, res) => {
     if (ticketsError) throw new Error(`Erro ao criar tickets: ${ticketsError.message}`);
     ticketIds = tickets.map(t => t.id);
 
-    // O PASSO 5 (Atualizar sold_quantity) foi removido porque o RPC 'reserve_tickets' já fez isso atomicamente.
+    // ── PASSO 5: Criar Conversões de Afiliados (Comissões RPs) ──────────────
+    if (promoterId) {
+      // Comissão ganha por cada bilhete
+      const commissionAmount = parseFloat((pricePaid * (commissionRate / 100)).toFixed(2));
+      
+      const conversionsToInsert = ticketIds.map(tId => ({
+        promoter_id: promoterId,
+        ticket_id: tId,
+        commission_amount: commissionAmount,
+        status: 'pending'
+      }));
+
+      const { error: convError } = await supabase
+        .from('affiliate_conversions')
+        .insert(conversionsToInsert);
+
+      if (convError) throw new Error(`Erro ao registar comissão: ${convError.message}`);
+    }
 
     // ── SUCESSO ─────────────────────────────────────────────────────────────
     res.status(201).json({

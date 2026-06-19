@@ -104,3 +104,34 @@
   font-weight: bold;
   font-size: 0.75rem;
 }
+
+.scan-result.error {
+  border-color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.05);
+}
+.scan-result.error h3 {
+  color: #ff4d4f;
+}
+.scan-result.warning {
+  border-color: #faad14;
+  background: rgba(250, 173, 20, 0.05);
+}
+.scan-result.warning h3 {
+  color: #faad14;
+}
+.status-used {
+  background: #faad14;
+  color: #000;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.75rem;
+}
+.status-invalid {
+  background: #ff4d4f;
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.75rem;
+}

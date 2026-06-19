@@ -12,7 +12,7 @@ export default function CalculatorPage() {
     staffCost: 2000,
     marketing: 1500,
     platformFee: (capacity * ticketPrice) * 0.05,
-    totalExpenses: (capacity * 15) + (capacity * 8) + 2000 + 1500 + ((capacity * ticketPrice) * 0.05),
+    totalExpenses: 0,
   };
 
   calculations.totalExpenses = calculations.venueCost + calculations.artistFees + calculations.staffCost + calculations.marketing + calculations.platformFee;

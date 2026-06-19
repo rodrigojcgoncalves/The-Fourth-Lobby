@@ -58,7 +58,7 @@ export default function CreateEventPage() {
     }
     const fetchArtists = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/artists');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/artists`);
         if (response.ok) {
           const data = await response.json();
           const filtered = data.filter((a: Artist) => 
@@ -144,7 +144,7 @@ export default function CreateEventPage() {
         const formData = new FormData();
         formData.append('image', artistImageFile);
 
-        const uploadRes = await fetch('http://localhost:5000/api/artists/upload', {
+        const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/api/artists/upload`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` },
           body: formData
@@ -155,7 +155,7 @@ export default function CreateEventPage() {
         finalImageUrl = uploadData.imageUrl;
       }
 
-      const res = await fetch('http://localhost:5000/api/artists', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/artists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ export default function CreateEventPage() {
         const formData = new FormData();
         formData.append('image', imageFile);
 
-        const uploadRes = await fetch('http://localhost:5000/api/events/upload', {
+        const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/api/events/upload`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` },
           body: formData
@@ -221,7 +221,7 @@ export default function CreateEventPage() {
         artists: selectedArtists.map(a => a.id)
       };
 
-      const eventRes = await fetch('http://localhost:5000/api/events', {
+      const eventRes = await fetch(`${import.meta.env.VITE_API_URL}/api/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -24,9 +24,6 @@ IMPORTANTE: não esquecer da segurança de todas as rotas, para ninguém entrar 
 
 CORRIGIR:
 
-A descrição dos bilhetes não está a aparecer no evento
-Página de Checkout ainda está estática
-Página My Tickets ainda está estática
 Media center funcional
 
 ## 2.1 Organizador
@@ -108,7 +105,7 @@ Esta secção organiza as tuas metas de forma técnica para execução.
 - [x] **Sidebar Administrativa:** Acesso rápido a Eventos, Equipa de RPs e Perfil da Organização.
 - [x] **Página de Detalhes do Evento (Interna):**
   - Abas/Menu para: **Editar Evento**, **Estatísticas (NLP)**, **Gestão de RPs**, **Artistas**, **Bilhetes**, **Despesas** e **Check-in/Scan**.
-- [ ] **Gestão Financeira (Despesas):** Sistema para adicionar despesas (nome, valor, estado de pagamento, responsável) com cálculo de balanço total.
+- [x] **Gestão Financeira (Despesas):** Sistema para adicionar despesas (nome, valor, estado de pagamento, responsável) com cálculo de balanço total.
 - [ ] **Configuração de RPs:** Toggle de comissão (%), definição de descontos por promocode.
 - [ ] **Perfil da Label (`/label/:slug`):** Banner, logo, bio e histórico público de eventos/artistas.
 - [x] **Validação Visual:** Imagens em 16:9 e controlos de visibilidade (Public/Private) por evento e fase.

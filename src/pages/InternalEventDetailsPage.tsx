@@ -71,7 +71,7 @@ export default function InternalEventDetailsPage() {
       if (!id || !token) return;
       setLoadingEvent(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Evento não encontrado ou sem permissão.');
@@ -93,7 +93,7 @@ export default function InternalEventDetailsPage() {
       if (!id || !token) return;
       setLoadingGuests(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/organizer/events/${id}/guests`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/organizer/events/${id}/guests`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Erro ao carregar a lista de convidados.');
@@ -118,7 +118,7 @@ export default function InternalEventDetailsPage() {
     if (!id || !token) return;
     setLoadingExpenses(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/expenses/event/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/event/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Erro ao carregar despesas.');
@@ -142,7 +142,7 @@ export default function InternalEventDetailsPage() {
     if (!id || !token) return;
     setSavingExpense(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/expenses/event/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/event/${id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
@@ -169,7 +169,7 @@ export default function InternalEventDetailsPage() {
   const handleTogglePaid = async (expenseId: string) => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/expenses/${expenseId}/toggle-paid`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/${expenseId}/toggle-paid`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({})
@@ -189,7 +189,7 @@ export default function InternalEventDetailsPage() {
     if (!confirm('Tens a certeza que queres apagar esta despesa?')) return;
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/expenses/${expenseId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/${expenseId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -7,10 +7,12 @@ import CheckoutPage from './pages/CheckoutPage';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import PromoterDashboard from './pages/PromoterDashboard';
+import PromoterEventsPage from './pages/PromoterEventsPage';
 import OrganizerDashboard from './pages/OrganizerDashboard';
 import QRScannerPage from './pages/QRScannerPage';
 import CreateEventPage from './pages/CreateEventPage';
 import EditEventPage from './pages/EditEventPage';
+import OrganizerTeamPage from './pages/OrganizerTeamPage';
 import CalculatorPage from './pages/CalculatorPage';
 import SuccessPage from './pages/SuccessPage';
 import NotFound from './pages/NotFound';
@@ -31,8 +33,12 @@ export const router = createBrowserRouter([
 
       // Rotas Protegidas - Promoter
       { 
-        path: 'promoter', 
+        path: 'portal-promotor', 
         element: <ProtectedRoute allowedRoles={['promoter']}><PromoterDashboard /></ProtectedRoute> 
+      },
+      { 
+        path: 'portal-promotor/label/:id', 
+        element: <ProtectedRoute allowedRoles={['promoter']}><PromoterEventsPage /></ProtectedRoute> 
       },
 
       // Rotas Protegidas - Organizador
@@ -43,7 +49,7 @@ export const router = createBrowserRouter([
           { index: true, element: <OrganizerDashboard /> },
           { path: 'events/:id', element: <InternalEventDetailsPage /> }, // Será criado a seguir
           { path: 'edit-event/:id', element: <EditEventPage /> },
-          { path: 'team', element: <div style={{padding: '2rem'}}>Equipa RPs (Brevemente)</div> },
+          { path: 'team', element: <OrganizerTeamPage /> },
           { path: 'label', element: <div style={{padding: '2rem'}}>Perfil da Label (Brevemente)</div> },
         ]
       },
@@ -63,8 +69,8 @@ export const router = createBrowserRouter([
       
       // Outras rotas
       { path: 'events/:slug', element: <EventDetailsPage /> },
-      { path: 'checkout', element: <CheckoutPage /> },
-      { path: 'success', element: <SuccessPage /> },
+      { path: 'checkout', element: <ProtectedRoute><CheckoutPage /></ProtectedRoute> },
+      { path: 'success', element: <ProtectedRoute><SuccessPage /></ProtectedRoute> },
       { path: '*', element: <NotFound /> },
     ],
   },

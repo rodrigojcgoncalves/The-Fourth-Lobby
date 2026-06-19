@@ -1,3 +1,7 @@
+perguntas professor
+
+faz sentido este site ser exclusivo para a minha label? ao invés de ser um market place
+
 # 1. Criação da base de dados.
 
 ## Este foi o scrip usado no SQL Editor do supabase para a criação da Base de Dados
@@ -531,6 +535,40 @@ CREATE POLICY "Organizadores gerem a sua própria label" ON public.labels FOR AL
 -- 2. Adicionar colunas novas à tabela expenses existente
 ALTER TABLE public.expenses ADD COLUMN IF NOT EXISTS is_paid boolean default false;
 ALTER TABLE public.expenses ADD COLUMN IF NOT EXISTS paid_by text;
+
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name text;
+
+-- ADICIONAR CENA DOS PROMOTORES
+
+-- Criar a tabela de associação entre Labels e Promotores
+CREATE TABLE public.label_promoters (
+  id uuid primary key default uuid_generate_v4(),
+  label_id uuid references public.labels(id) on delete cascade,
+  user_id uuid references public.users(id) on delete cascade,
+  status text default 'active', -- pode ser 'pending', 'active', 'rejected'
+  created_at timestamp with time zone default timezone('utc'::text, now()),
+  UNIQUE(label_id, user_id)
+);
+
+-- Ativar RLS (Row Level Security)
+ALTER TABLE public.label_promoters ENABLE ROW LEVEL SECURITY;
+
+-- O promotor apenas vê as labels a que pertence
+CREATE POLICY "Promotor vê as suas labels"
+  ON public.label_promoters FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- O organizador apenas vê e gere os promotores da sua própria label
+CREATE POLICY "Organizador gere os seus promotores"
+  ON public.label_promoters FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.labels
+      WHERE labels.id = label_promoters.label_id
+      AND labels.owner_id = auth.uid()
+    )
+  );
 
 ```
 

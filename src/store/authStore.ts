@@ -1,17 +1,17 @@
 import { create } from 'zustand';
+import { UserRole } from '../types';
 
-export type UserRole = 'customer' | 'promoter' | 'organizer' | null;
 
 export interface CustomUser {
   id: string;
   email: string;
-  role: UserRole;
+  role: UserRole | null;
   fullName?: string;
 }
 
 interface AuthState {
   user: CustomUser | null;
-  role: UserRole;
+  role: UserRole | null;
   loading: boolean;
   initialize: () => Promise<void>;
   signOut: () => void;
@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     
     if (token) {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/me', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

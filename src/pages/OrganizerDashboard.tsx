@@ -19,7 +19,7 @@ export default function OrganizerDashboard() {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/events/my/events', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/events/my/events`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -41,7 +41,7 @@ export default function OrganizerDashboard() {
 
     const token = localStorage.getItem('jwt_token');
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${eventId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${eventId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

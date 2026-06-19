@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="footer-content">
         <div className="footer-section">
           <h4>About Us</h4>
-          <p>The Fourth Lobby is Porto's premier HardTechno label bringing you the hardest beats and darkest nights.</p>
+          <p>The Fourth Lobby is a independent project, based in covilhã. They are bringing the dark, fast and heavy techno to the underground scene. </p>
         </div>
 
         <div className="footer-section">
@@ -23,9 +23,9 @@ export default function Footer() {
 
         <div className="footer-section">
           <h4>Contact</h4>
-          <p>Email: info@thefourthlobby.com</p>
-          <p>Phone: +351 XXX XXX XXX</p>
-          <p>Location: Porto, Portugal</p>
+          <p>Email: fourth@dimensionevents.pt</p>
+          <p>Phone: +351 925 361 469</p>
+          <p>Location: Covilhã, Portugal</p>
         </div>
 
         <div className="footer-section">
@@ -40,7 +40,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {currentYear} The Fourth Lobby. All rights reserved.</p>
+        <p>&copy; {currentYear} The Fourth Lobby - Fourth Dimension. All rights reserved.</p>
         <div className="footer-links">
           <a href="#privacy">Privacy Policy</a>
           <a href="#terms">Terms of Service</a>

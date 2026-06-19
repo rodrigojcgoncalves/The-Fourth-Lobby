@@ -13,6 +13,7 @@
     "@stripe/react-stripe-js": "^6.3.0",
     "@supabase/supabase-js": "^2.105.1",
     "date-fns": "^4.1.0",
+    "html5-qrcode": "^2.3.8",
     "lucide-react": "^1.14.0",
     "qrcode.react": "^4.2.0",
     "react": "^18.2.0",

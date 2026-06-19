@@ -31,11 +31,11 @@ router.post('/register', async (req, res) => {
     const id = crypto.randomUUID();
 
     // 4. Save to database
-    // We assume the 'users' table has columns: id, email, password_hash, role
+    // The 'users' table has columns: id, email, password_hash, role, full_name
     const { data: newUser, error } = await supabase
       .from('users')
       .insert([
-        { id, email, password_hash: passwordHash, role }
+        { id, email, password_hash: passwordHash, role, full_name: fullName || null }
       ])
       .select()
       .single();
@@ -44,7 +44,7 @@ router.post('/register', async (req, res) => {
 
     // 5. Generate JWT token
     const token = jwt.sign(
-      { id: newUser.id, email: newUser.email, role: newUser.role },
+      { id: newUser.id, email: newUser.email, role: newUser.role, fullName: newUser.full_name || fullName || null },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
@@ -52,7 +52,7 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       message: 'Registo bem sucedido!',
       token,
-      user: { id: newUser.id, email: newUser.email, role: newUser.role, fullName }
+      user: { id: newUser.id, email: newUser.email, role: newUser.role, fullName: newUser.full_name || fullName || null }
     });
 
   } catch (err) {
@@ -89,7 +89,7 @@ router.post('/login', async (req, res) => {
 
     // 3. Generate JWT token
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, fullName: user.full_name || null },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
@@ -97,7 +97,7 @@ router.post('/login', async (req, res) => {
     res.json({
       message: 'Login bem sucedido!',
       token,
-      user: { id: user.id, email: user.email, role: user.role }
+      user: { id: user.id, email: user.email, role: user.role, fullName: user.full_name || null }
     });
 
   } catch (err) {
@@ -106,13 +106,27 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET /api/auth/me - Exemplo de Rota Protegida (Exige JWT)
-router.get('/me', verifyToken, (req, res) => {
-  // req.user contém as infos descodificadas do JWT
-  res.json({ 
-    message: 'Acesso autorizado.',
-    user: req.user 
-  });
+// GET /api/auth/me - Rota Protegida que retorna os dados do utilizador
+router.get('/me', verifyToken, async (req, res) => {
+  try {
+    // Buscar dados atualizados da BD (o JWT pode não ter fullName de tokens antigos)
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, email, role, full_name')
+      .eq('id', req.user.id)
+      .single();
+
+    if (error || !user) {
+      return res.status(404).json({ message: 'Utilizador não encontrado.' });
+    }
+
+    res.json({ 
+      message: 'Acesso autorizado.',
+      user: { id: user.id, email: user.email, role: user.role, fullName: user.full_name || null }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao obter dados do utilizador.', error: err.message });
+  }
 });
 
 module.exports = router;

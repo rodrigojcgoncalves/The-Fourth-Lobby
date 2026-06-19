@@ -1,0 +1,21 @@
+.organizer-team-page {
+  padding: 2rem 0;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.team-card {
+  transition: all 0.3s ease;
+}
+
+.team-card.inactive {
+  filter: grayscale(0.5);
+}

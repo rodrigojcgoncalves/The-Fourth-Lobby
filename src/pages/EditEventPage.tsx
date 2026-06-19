@@ -57,7 +57,7 @@ export default function EditEventPage() {
 
     const fetchEvent = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Evento não encontrado.');
@@ -102,7 +102,7 @@ export default function EditEventPage() {
     if (searchArtistTerm.length < 2) { setSearchResults([]); return; }
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/artists');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/artists`);
         if (res.ok) {
           const data = await res.json();
           setSearchResults(data.filter((a: Artist) =>
@@ -164,7 +164,7 @@ export default function EditEventPage() {
       if (artistImageFile) {
         const formData = new FormData();
         formData.append('image', artistImageFile);
-        const uploadRes = await fetch('http://localhost:5000/api/artists/upload', {
+        const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/api/artists/upload`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` },
           body: formData
@@ -173,7 +173,7 @@ export default function EditEventPage() {
         if (!uploadRes.ok) throw new Error(uploadData.message || 'Erro no upload da foto');
         finalImageUrl = uploadData.imageUrl;
       }
-      const res = await fetch('http://localhost:5000/api/artists', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/artists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ...newArtist, image_url: finalImageUrl })
@@ -202,7 +202,7 @@ export default function EditEventPage() {
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
-        const uploadRes = await fetch('http://localhost:5000/api/events/upload', {
+        const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/api/events/upload`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` },
           body: formData
@@ -230,7 +230,7 @@ export default function EditEventPage() {
         artists: selectedArtists.map(a => a.id)
       };
 
-      const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

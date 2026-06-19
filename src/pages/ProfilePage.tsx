@@ -26,7 +26,7 @@ export default function ProfilePage() {
     <div className="container profile-page">
       <div className="profile-header">
         <div className="profile-info">
-          <h1>{user.user_metadata?.full_name || user.email}</h1>
+          <h1>{user.fullName || user.email}</h1>
           <p className="role-badge">{(role || 'customer').toUpperCase()}</p>
           <p className="email">{user.email}</p>
         </div>
@@ -60,7 +60,7 @@ export default function ProfilePage() {
               <legend>Personal Information</legend>
               <div className="form-group">
                 <label>Full Name</label>
-                <input type="text" defaultValue={user.user_metadata?.full_name || ''} />
+                <input type="text" defaultValue={user.fullName || ''} />
               </div>
               <div className="form-group">
                 <label>Email</label>

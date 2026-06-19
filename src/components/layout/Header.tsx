@@ -58,8 +58,8 @@ export default function Header({ currentUser, onLogout }: HeaderProps) {
 
           {/* Visível apenas para Promotores */}
           {currentUser?.role === 'promoter' && (
-            <button className="nav-link" onClick={() => navigate('/promoter')}>
-              Promoter
+            <button className="nav-link" onClick={() => navigate('/portal-promotor')}>
+              Portal de Promotor
             </button>
           )}
 

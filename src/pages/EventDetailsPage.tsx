@@ -14,11 +14,11 @@ export default function EventDetailsPage() {
       if (!slug) return;
       try {
         // Tenta pelo slug primeiro; se falhar, tenta pelo UUID (compatibilidade)
-        const res = await fetch(`http://localhost:5000/api/events/slug/${slug}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events/slug/${slug}`);
 
         if (!res.ok) {
           // Fallback: tenta pelo UUID caso o slug ainda não exista
-          const fallback = await fetch(`http://localhost:5000/api/events/${slug}`);
+          const fallback = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${slug}`);
           if (!fallback.ok) throw new Error('Evento não encontrado.');
           const data = await fallback.json();
           setEvent(data as Event);

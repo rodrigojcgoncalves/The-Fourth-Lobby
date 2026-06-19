@@ -12,9 +12,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Flag discreta: true se o user clicou em "Sou um organizador"
-  const [isOrganizer, setIsOrganizer] = useState(false);
-
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -36,9 +33,8 @@ export default function LoginPage() {
       if (isLogin) {
         loggedUser = await authService.login(formData.email, formData.password);
       } else {
-        // O role é sempre 'customer' por padrão.
-        // Se clicou em "Sou um organizador", envia 'organizer'.
-        const role = isOrganizer ? 'organizer' : 'customer';
+        // O role é sempre 'customer' no registo público
+        const role = 'customer';
         const data = await authService.register(formData.email, formData.password, formData.fullName, role);
         loggedUser = data.user;
       }
@@ -55,10 +51,8 @@ export default function LoginPage() {
     }
   };
 
-  // Quando muda de tab, reseta o estado de organizador
   const handleTabSwitch = (loginMode: boolean) => {
     setIsLogin(loginMode);
-    setIsOrganizer(false);
     setError(null);
   };
 
@@ -93,19 +87,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Banner visível quando o utilizador está a registar como organizador */}
-            {!isLogin && isOrganizer && (
-              <div className="organizer-banner">
-                🎛️ A criar conta como <strong>Organizador</strong>
-                <button
-                  type="button"
-                  className="organizer-banner-cancel"
-                  onClick={() => setIsOrganizer(false)}
-                >
-                  ✕
-                </button>
-              </div>
-            )}
+
 
             <fieldset>
               <div className="form-group">
@@ -172,19 +154,7 @@ export default function LoginPage() {
               </p>
             )}
 
-            {/* Link "Sou um organizador" — só aparece no formulário de Registo */}
-            {!isLogin && !isOrganizer && (
-              <p className="forgot-password">
-                <button
-                  type="button"
-                  className="organizer-link"
-                  onClick={() => setIsOrganizer(true)}
-                  disabled={loading}
-                >
-                  Sou um organizador
-                </button>
-              </p>
-            )}
+
           </div>
 
           <p className="login-note">

@@ -22,6 +22,12 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Estados do Promocode
+  const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; discountPercent: number } | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
+
   // Se não veio estado de navegação, é acesso direto (URL bar)
   if (!state) {
     return (
@@ -37,7 +43,31 @@ export default function CheckoutPage() {
     );
   }
 
-  const total = (state.price * quantity).toFixed(2);
+  const baseTotal = state.price * quantity;
+  const discountAmount = appliedPromo ? (baseTotal * (appliedPromo.discountPercent / 100)) : 0;
+  const total = (baseTotal - discountAmount).toFixed(2);
+
+  const handleVerifyPromo = async () => {
+    setPromoError(null);
+    setPromoSuccess(null);
+    if (!promoCodeInput.trim()) return;
+
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/promoters/verify/${promoCodeInput.trim()}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.message || 'Código inválido');
+      
+      setAppliedPromo({ code: promoCodeInput.trim(), discountPercent: data.discount_percentage });
+      setPromoSuccess(data.message);
+    } catch (err: any) {
+      setPromoError(err.message);
+      setAppliedPromo(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +82,7 @@ export default function CheckoutPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +90,8 @@ export default function CheckoutPage() {
         },
         body: JSON.stringify({
           ticket_type_id: state.ticketTypeId,
-          quantity
+          quantity,
+          referral_code: appliedPromo ? appliedPromo.code : undefined
         })
       });
 
@@ -118,10 +149,42 @@ export default function CheckoutPage() {
                 >+</button>
               </div>
             </div>
-            <div className="summary-total">
-              <span>Total:</span>
-              <span>€{total}</span>
+            
+            {appliedPromo && (
+              <div className="summary-item" style={{ color: '#4ade80' }}>
+                <span>Desconto RP ({appliedPromo.discountPercent}%):</span>
+                <span>-€{discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+
+            <div className="summary-total" style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '1rem', marginTop: '1rem' }}>
+              <span>Total a Pagar:</span>
+              <span style={{ color: appliedPromo ? '#4ade80' : 'white' }}>€{total}</span>
             </div>
+          </div>
+
+          {/* Secção de Promocode */}
+          <div className="promocode-section glass-card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
+            <h4 style={{ margin: '0 0 1rem 0' }}>Tens um código promocional?</h4>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <input 
+                type="text" 
+                placeholder="Ex: RODRIGO20" 
+                value={promoCodeInput}
+                onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                style={{ flex: 1, padding: '0.75rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', textTransform: 'uppercase' }}
+                disabled={!!appliedPromo}
+              />
+              <button 
+                type="button" 
+                className="btn-secondary" 
+                onClick={appliedPromo ? () => { setAppliedPromo(null); setPromoCodeInput(''); setPromoSuccess(null); } : handleVerifyPromo}
+              >
+                {appliedPromo ? 'Remover' : 'Aplicar'}
+              </button>
+            </div>
+            {promoError && <div style={{ color: 'var(--accent-red)', marginTop: '0.5rem', fontSize: '0.9rem' }}>{promoError}</div>}
+            {promoSuccess && <div style={{ color: '#4ade80', marginTop: '0.5rem', fontSize: '0.9rem' }}>{promoSuccess}</div>}
           </div>
 
           {error && <div className="form-error" style={{ marginBottom: '1rem' }}>{error}</div>}

@@ -44,7 +44,7 @@ export default function TicketsPage() {
       }
 
       try {
-        const res = await fetch('http://localhost:5000/api/tickets/my', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tickets/my`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Erro ao carregar bilhetes.');
