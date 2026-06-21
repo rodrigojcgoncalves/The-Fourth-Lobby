@@ -385,6 +385,19 @@ router.delete('/:id', verifyToken, requireRole('organizer'), async (req, res) =>
       return res.status(403).json({ message: 'Não tens permissão para apagar este evento.' });
     }
 
+    // Verificar se existem bilhetes vendidos — não permitir apagar se houver
+    const { data: soldTickets } = await supabase
+      .from('tickets')
+      .select('id')
+      .eq('event_id', req.params.id)
+      .limit(1);
+
+    if (soldTickets && soldTickets.length > 0) {
+      return res.status(409).json({ 
+        message: 'Não é possível apagar este evento porque já foram vendidos bilhetes. Altera o estado para "Cancelado" em alternativa.' 
+      });
+    }
+
     const { error } = await supabase
       .from('events')
       .delete()

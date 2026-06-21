@@ -36,6 +36,10 @@ export default function HomePage() {
     navigate('/events');
   };
 
+  const now = new Date();
+  const upcomingEvents = events.filter(e => new Date(e.date) >= now);
+  const pastEvents = events.filter(e => new Date(e.date) < now);
+
   return (
     <div className="home-page">
       {/* ── Hero Section ── */}
@@ -54,11 +58,11 @@ export default function HomePage() {
         <h2 className="section-title">Upcoming Events</h2>
         {loading ? (
           <p className="loading-text">Loading events...</p>
-        ) : events.length === 0 ? (
+        ) : upcomingEvents.length === 0 ? (
           <p className="loading-text">No upcoming events at the moment.</p>
         ) : (
           <div className="events-grid">
-            {events.map(event => (
+            {upcomingEvents.map(event => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>
@@ -103,6 +107,18 @@ export default function HomePage() {
           </a>
         </div>
       </section>
+
+      {/* ── Past Events ── */}
+      {pastEvents.length > 0 && (
+        <section className="home-section past-events-section container">
+          <h2 className="section-title">Past Events</h2>
+          <div className="events-grid">
+            {pastEvents.map(event => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

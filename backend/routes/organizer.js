@@ -6,10 +6,16 @@
  *   → Lista todos os bilhetes vendidos para um evento (apenas o dono do evento)
  */
 const express = require('express');
+const multer = require('multer');
 const { verifyToken, requireRole } = require('../middleware/auth');
 const { supabase } = require('../lib/supabase');
 
 const router = express.Router();
+
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+});
 
 // Função auxiliar para garantir que um organizador tem Label
 async function getOrCreateLabel(user) {
@@ -179,15 +185,31 @@ router.get('/team', verifyToken, requireRole('organizer'), async (req, res) => {
       throw teamError;
     }
 
-    // 3. Obter os referral codes da tabela promoters
+    // 3. Obter os IDs e referral codes da tabela promoters
     const userIds = team.map(t => t.user_id);
     const { data: promotersData } = await supabase
       .from('promoters')
-      .select('user_id, referral_code')
+      .select('id, user_id, referral_code')
       .in('user_id', userIds);
+
+    const promoterIds = promotersData ? promotersData.map(p => p.id) : [];
+    
+    // 4. Obter as conversões reais (bilhetes vendidos por eles)
+    let conversionsData = [];
+    if (promoterIds.length > 0) {
+      const { data: cData } = await supabase
+        .from('affiliate_conversions')
+        .select('promoter_id')
+        .in('promoter_id', promoterIds);
+      conversionsData = cData || [];
+    }
 
     const formattedTeam = team.map(t => {
       const pData = (promotersData || []).find(p => p.user_id === t.user_id);
+      const ticketsSold = pData 
+        ? conversionsData.filter(c => c.promoter_id === pData.id).length 
+        : 0;
+
       return {
         id: t.id,
         user_id: t.user_id,
@@ -195,7 +217,7 @@ router.get('/team', verifyToken, requireRole('organizer'), async (req, res) => {
         email: t.users?.email,
         full_name: t.users?.full_name,
         referral_code: pData ? pData.referral_code : 'N/A',
-        tickets_sold: 0 // Simplificação Ponytail
+        tickets_sold: ticketsSold
       };
     });
 
@@ -240,10 +262,11 @@ router.post('/team/invite', verifyToken, requireRole('organizer'), async (req, r
       return res.status(400).json({ message: 'Este utilizador já pertence à tua equipa.' });
     }
 
-    // 4. Promover a 'promoter' se não for, e gerar referral code (simulação)
-    if (user.role !== 'promoter') {
+    // 4. Só promover a 'promoter' se for um simples 'customer'. Nunca fazer downgrade de roles superiores.
+    if (user.role === 'customer') {
       await supabase.from('users').update({ role: 'promoter' }).eq('id', user.id);
     }
+    // Se já for 'promoter' ou 'organizer', não alterar — apenas garantir que está na tabela promoters
     
     // Garantir que existe na tabela promoters
     const { data: pExist } = await supabase.from('promoters').select('id').eq('user_id', user.id).single();
@@ -268,7 +291,13 @@ router.post('/team/invite', verifyToken, requireRole('organizer'), async (req, r
 // PUT /api/organizer/team/:userId/status - Mudar Estado (Soft Delete)
 router.put('/team/:userId/status', verifyToken, requireRole('organizer'), async (req, res) => {
   const { userId } = req.params;
-  const { status } = req.body; // 'active' ou 'inactive'
+  const { status } = req.body;
+
+  // Validar que o status é um valor permitido
+  const ALLOWED_STATUSES = ['active', 'inactive'];
+  if (!status || !ALLOWED_STATUSES.includes(status)) {
+    return res.status(400).json({ message: `Status inválido. Valores permitidos: ${ALLOWED_STATUSES.join(', ')}.` });
+  }
 
   try {
     const label = await getOrCreateLabel(req.user);
@@ -286,6 +315,128 @@ router.put('/team/:userId/status', verifyToken, requireRole('organizer'), async 
     res.json({ message: 'Estado atualizado com sucesso.' });
   } catch (err) {
     res.status(500).json({ message: 'Erro ao atualizar estado.', error: err.message });
+  }
+});
+
+// --- GESTÃO DA LABEL (PERFIL) ---
+
+// GET /api/organizer/label-profile - Ver Perfil e Métricas da Label
+router.get('/label-profile', verifyToken, requireRole('organizer'), async (req, res) => {
+  try {
+    const label = await getOrCreateLabel(req.user);
+    if (!label) return res.status(500).json({ message: 'Tabela labels não existe.' });
+
+    // Buscar dados completos da label
+    const { data: labelData, error } = await supabase
+      .from('labels')
+      .select('name, slug, bio, logo_url, banner_url, support_email, payment_info, social_links')
+      .eq('id', label.id)
+      .single();
+
+    if (error) throw error;
+
+    // Calcular Métricas Agregadas (Global Revenue e Total Tickets)
+    // 1. Obter todos os eventos deste organizador
+    const { data: events } = await supabase.from('events').select('id').eq('organizer_id', req.user.id);
+    const eventIds = events ? events.map(e => e.id) : [];
+
+    let totalTicketsSold = 0;
+    let globalRevenue = 0;
+
+    if (eventIds.length > 0) {
+      // 2. Buscar todas as orders (pagas) ou tickets destes eventos
+      // Incluir 'valid' E 'used' — ambos representam vendas reais e confirmadas
+      const { data: tickets } = await supabase
+        .from('tickets')
+        .select('price_paid')
+        .in('event_id', eventIds)
+        .in('status', ['valid', 'used']);
+
+      if (tickets && tickets.length > 0) {
+        totalTicketsSold = tickets.length;
+        globalRevenue = tickets.reduce((sum, t) => sum + parseFloat(t.price_paid || 0), 0);
+      }
+    }
+
+    res.json({
+      ...labelData,
+      metrics: {
+        totalTicketsSold,
+        globalRevenue
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao carregar perfil da label.', error: err.message });
+  }
+});
+
+// PUT /api/organizer/label-profile - Atualizar Perfil da Label
+router.put('/label-profile', verifyToken, requireRole('organizer'), async (req, res) => {
+  const { name, bio, support_email, payment_info, social_links } = req.body;
+
+  try {
+    const label = await getOrCreateLabel(req.user);
+    if (!label) return res.status(500).json({ message: 'Tabela labels não existe.' });
+
+    const updatePayload = {
+      name,
+      bio,
+      support_email,
+      payment_info,
+      social_links: social_links || {}
+    };
+
+    const { error } = await supabase
+      .from('labels')
+      .update(updatePayload)
+      .eq('id', label.id);
+
+    if (error) throw error;
+
+    res.json({ message: 'Perfil da label atualizado com sucesso.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao atualizar perfil.', error: err.message });
+  }
+});
+
+// POST /api/organizer/label-profile/upload - Upload de logo ou banner
+router.post('/label-profile/upload', verifyToken, requireRole('organizer'), upload.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'Ficheiro não enviado.' });
+  
+  // fieldName ajuda-nos a saber se é 'logo' ou 'banner' para atualizar a BD automaticamente
+  const { type } = req.body; // 'logo' ou 'banner'
+
+  try {
+    const fileExt = req.file.originalname.split('.').pop();
+    const fileName = `labels/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('event-images') // usamos o mesmo bucket para simplificar (podemos ajustar depois se necessário)
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrlData } = supabase.storage
+      .from('event-images')
+      .getPublicUrl(fileName);
+
+    const imageUrl = publicUrlData.publicUrl;
+
+    // Se passarem o tipo, guardamos logo na BD
+    if (type === 'logo' || type === 'banner') {
+      const label = await getOrCreateLabel(req.user);
+      if (label) {
+        const updateField = type === 'logo' ? { logo_url: imageUrl } : { banner_url: imageUrl };
+        await supabase.from('labels').update(updateField).eq('id', label.id);
+      }
+    }
+
+    res.json({ message: 'Upload feito com sucesso.', imageUrl });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao fazer upload da imagem.', error: err.message });
   }
 });
 

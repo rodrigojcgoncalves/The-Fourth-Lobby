@@ -87,6 +87,17 @@ export default function EditEventPage() {
         } else {
           setPhases([{ id: crypto.randomUUID(), name: 'Fase Geral', description: '', price: 10, quantity: 100 }]);
         }
+
+        // Artistas — carregar os artistas já associados ao evento
+        if (data.artists && data.artists.length > 0) {
+          setSelectedArtists(data.artists.map((a: any) => ({
+            id: a.id,
+            name: a.name,
+            genre: a.genre,
+            bio: a.bio || undefined,
+            image_url: a.image_url || undefined
+          })));
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro ao carregar evento.');
       } finally {

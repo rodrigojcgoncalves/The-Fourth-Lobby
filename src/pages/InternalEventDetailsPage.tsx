@@ -88,7 +88,7 @@ export default function InternalEventDetailsPage() {
 
   // Fetch guests
   useEffect(() => {
-    if (activeTab !== 'guests' || guests.length > 0) return;
+    if (activeTab !== 'guests') return;
     async function fetchGuests() {
       if (!id || !token) return;
       setLoadingGuests(true);
@@ -205,7 +205,11 @@ export default function InternalEventDetailsPage() {
 
   // --- Calculations ---
   const totalSold = event.ticket_types?.reduce((sum, tt) => sum + (tt.sold_quantity || 0), 0) ?? 0;
-  const totalRevenue = event.ticket_types?.reduce((sum, tt) => sum + ((tt.sold_quantity || 0) * tt.price), 0) ?? 0;
+  // Calcular receita a partir dos price_paid reais (inclui descontos de promocode)
+  // guests têm price_paid real; se não carregados ainda, fallback para estimativa de preço base
+  const totalRevenue = guests.length > 0
+    ? guests.reduce((sum, g) => sum + Number(g.price_paid || 0), 0)
+    : event.ticket_types?.reduce((sum, tt) => sum + ((tt.sold_quantity || 0) * tt.price), 0) ?? 0;
   const totalExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
   const paidExpenses = expenses.filter(e => e.is_paid).reduce((sum, e) => sum + Number(e.amount), 0);
   const pendingExpenses = totalExpenses - paidExpenses;

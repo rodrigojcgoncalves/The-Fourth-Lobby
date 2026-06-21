@@ -20,6 +20,9 @@ export default function OrganizerLayout() {
           <NavLink to="/organizer/label" className={({ isActive }) => isActive ? 'active' : ''}>
             Perfil da Label
           </NavLink>
+          <NavLink to="/organizer/feedback" className={({ isActive }) => isActive ? 'active' : ''}>
+            Feedback e IA
+          </NavLink>
         </nav>
 
         <div className="sidebar-footer">

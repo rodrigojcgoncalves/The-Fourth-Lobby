@@ -6,7 +6,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
@@ -18,6 +21,7 @@ const artistRoutes = require('./routes/artists');
 const orderRoutes = require('./routes/orders');
 const organizerRoutes = require('./routes/organizer');
 const promotersRoutes = require('./routes/promoters');
+const feedbacksRoutes = require('./routes/feedbacks');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
@@ -27,6 +31,7 @@ app.use('/api/artists', artistRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/organizer', organizerRoutes);
 app.use('/api/promoters', promotersRoutes);
+app.use('/api/feedbacks', feedbacksRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

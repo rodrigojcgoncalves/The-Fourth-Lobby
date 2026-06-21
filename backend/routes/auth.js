@@ -9,7 +9,8 @@ const router = express.Router();
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
-  const { email, password, fullName, role = 'customer' } = req.body;
+  const { email, password, fullName } = req.body;
+  const role = 'customer'; // Role é SEMPRE 'customer' no registo público. Nunca confiar no cliente.
 
   try {
     // 1. Check if user already exists

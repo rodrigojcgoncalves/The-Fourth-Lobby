@@ -13,6 +13,8 @@ import QRScannerPage from './pages/QRScannerPage';
 import CreateEventPage from './pages/CreateEventPage';
 import EditEventPage from './pages/EditEventPage';
 import OrganizerTeamPage from './pages/OrganizerTeamPage';
+import OrganizerLabelPage from './pages/OrganizerLabelPage';
+import OrganizerFeedbackPage from './pages/OrganizerFeedbackPage';
 import CalculatorPage from './pages/CalculatorPage';
 import SuccessPage from './pages/SuccessPage';
 import NotFound from './pages/NotFound';
@@ -50,7 +52,8 @@ export const router = createBrowserRouter([
           { path: 'events/:id', element: <InternalEventDetailsPage /> }, // Será criado a seguir
           { path: 'edit-event/:id', element: <EditEventPage /> },
           { path: 'team', element: <OrganizerTeamPage /> },
-          { path: 'label', element: <div style={{padding: '2rem'}}>Perfil da Label (Brevemente)</div> },
+          { path: 'label', element: <OrganizerLabelPage /> },
+          { path: 'feedback', element: <OrganizerFeedbackPage /> },
         ]
       },
       // Estas rotas ficam for de /organizer/ (ou podiam estar dentro, mas para não quebrar links existentes deixamos fora, exeto edit-event)

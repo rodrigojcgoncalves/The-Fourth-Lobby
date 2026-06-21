@@ -1,0 +1,165 @@
+.feedback-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.feedback-modal-content {
+  background: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(15, 15, 15, 0.95));
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 212, 255, 0.05);
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.feedback-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.feedback-close-btn:hover {
+  color: #fff;
+}
+
+.feedback-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.feedback-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.feedback-event-name {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #00d4ff;
+  opacity: 0.9;
+}
+
+/* Stars Rating */
+.feedback-stars {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.star-btn:hover {
+  transform: scale(1.1);
+}
+
+.star-btn.active {
+  color: #00d4ff;
+  text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+}
+
+/* Textarea */
+.feedback-form label {
+  display: block;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.5rem;
+}
+
+.feedback-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.feedback-form textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  padding: 1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.feedback-form textarea:focus {
+  outline: none;
+  border-color: #00d4ff;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Actions */
+.feedback-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.feedback-actions button {
+  flex: 1;
+}
+
+/* Success State */
+.feedback-success {
+  text-align: center;
+  padding: 2rem 0;
+  animation: fadeIn 0.4s ease;
+}
+
+.feedback-success svg {
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.3));
+}
+
+.feedback-success h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.feedback-success p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+}

@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import Header from './Header';
 import Footer from './Footer';
+import FeedbackModal from '../FeedbackModal';
 import { User } from '../../types';
 
 export default function Root() {
@@ -30,6 +31,7 @@ export default function Root() {
         <Outlet />
       </main>
       <Footer />
+      <FeedbackModal />
     </div>
   );
 }

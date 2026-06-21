@@ -570,6 +570,31 @@ CREATE POLICY "Organizador gere os seus promotores"
     )
   );
 
+
+-- 1. Adicionar as novas colunas à tabela labels
+ALTER TABLE public.labels
+ADD COLUMN IF NOT EXISTS bio TEXT,
+ADD COLUMN IF NOT EXISTS logo_url TEXT,
+ADD COLUMN IF NOT EXISTS banner_url TEXT,
+ADD COLUMN IF NOT EXISTS support_email TEXT,
+ADD COLUMN IF NOT EXISTS payment_info TEXT,
+ADD COLUMN IF NOT EXISTS social_links JSONB DEFAULT '{}'::jsonb;
+
+-- 2. Ativar o Row Level Security (RLS) na tabela labels (caso ainda não esteja ativo)
+ALTER TABLE public.labels ENABLE ROW LEVEL SECURITY;
+
+-- 3. Criar Política de Leitura: Qualquer pessoa pode ler os dados da Label (necessário para o futuro perfil público)
+CREATE POLICY "Leitura Pública das Labels"
+ON public.labels FOR SELECT
+USING (true);
+
+-- 4. Criar Política de Atualização: Apenas o Dono (owner_id) pode alterar a sua própria Label
+CREATE POLICY "Apenas o dono pode editar a sua label"
+ON public.labels FOR UPDATE
+USING (auth.uid() = owner_id)
+WITH CHECK (auth.uid() = owner_id);
+
+
 ```
 
 ## 1.2 Hugging Face

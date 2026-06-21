@@ -165,19 +165,42 @@ router.post('/', verifyToken, async (req, res) => {
     });
 
   } catch (err) {
-    console.error('[ORDERS] Erro - a fazer rollback:', err.message);
+    console.error('[ORDERS] Erro original - a iniciar rollback:', err.message);
 
-    // ── ROLLBACK MANUAL ─────────────────────────────────────────────────────
-    // 1. Libertar o stock que foi reservado no RPC
-    await supabase.rpc('release_tickets', { p_ticket_type_id: ticket_type_id, p_quantity: quantity });
+    // ── ROLLBACK MANUAL — cada passo tem tratamento de erro independente ──
+    try {
+      // 1. Libertar o stock que foi reservado no RPC (crítico — deve ser primeiro)
+      const { error: releaseError } = await supabase.rpc('release_tickets', { 
+        p_ticket_type_id: ticket_type_id, 
+        p_quantity: quantity 
+      });
+      if (releaseError) {
+        console.error('[ORDERS ROLLBACK CRÍTICO] Falha ao libertar stock! Intervenção manual necessária.', {
+          ticket_type_id,
+          quantity,
+          error: releaseError.message
+        });
+      }
+    } catch (releaseErr) {
+      console.error('[ORDERS ROLLBACK CRÍTICO] Exceção ao libertar stock:', releaseErr.message);
+    }
 
     // 2. Apagar por ordem inversa para respeitar foreign keys
-    if (ticketIds.length > 0) {
-      await supabase.from('tickets').delete().in('id', ticketIds);
+    try {
+      if (ticketIds.length > 0) {
+        await supabase.from('tickets').delete().in('id', ticketIds);
+      }
+    } catch (deleteTicketsErr) {
+      console.error('[ORDERS ROLLBACK] Falha ao apagar tickets:', deleteTicketsErr.message);
     }
-    if (orderId) {
-      await supabase.from('order_items').delete().eq('order_id', orderId);
-      await supabase.from('orders').delete().eq('id', orderId);
+
+    try {
+      if (orderId) {
+        await supabase.from('order_items').delete().eq('order_id', orderId);
+        await supabase.from('orders').delete().eq('id', orderId);
+      }
+    } catch (deleteOrderErr) {
+      console.error('[ORDERS ROLLBACK] Falha ao apagar order:', deleteOrderErr.message);
     }
 
     res.status(500).json({ message: 'Erro ao processar compra. Tenta novamente.', error: err.message });
