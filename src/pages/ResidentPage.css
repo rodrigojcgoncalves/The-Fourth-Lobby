@@ -1,0 +1,190 @@
+.resident-page {
+  padding-bottom: 4rem;
+  color: #fff;
+}
+
+/* ── Hero & Banner ── */
+.resident-hero {
+  position: relative;
+  margin-bottom: 4rem;
+}
+
+.resident-hero-banner {
+  height: 40vh;
+  min-height: 250px;
+  background-size: cover;
+  background-position: center 20%;
+  position: relative;
+  z-index: 0;
+}
+
+.resident-hero-banner::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(18,18,18,1) 100%);
+  backdrop-filter: blur(2px);
+}
+
+.resident-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: -120px auto 0; /* Pull up to overlap the banner */
+  padding: 0 2rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 2rem;
+}
+
+.resident-profile-photo {
+  width: 250px;
+  height: 350px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 12px;
+  border: 4px solid #121212;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  background-color: #1a1a1a;
+}
+
+.resident-header-info {
+  padding-bottom: 1rem;
+}
+
+.resident-name-large {
+  font-size: 4.5rem;
+  font-weight: 800;
+  letter-spacing: -2px;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+}
+
+.resident-role-badge {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ── Content ── */
+.resident-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.resident-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+}
+
+.resident-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 3rem;
+}
+
+.genre-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1.2rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.resident-bio {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 3rem;
+}
+
+.resident-bio p {
+  margin-bottom: 1.5rem;
+}
+
+.resident-socials {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.social-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Back Button ── */
+.back-btn-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 2rem 0;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.btn-back:hover {
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .resident-hero-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: -80px;
+    gap: 1.5rem;
+  }
+  
+  .resident-profile-photo {
+    width: 200px;
+    height: 280px;
+  }
+  
+  .resident-name-large {
+    font-size: 3rem;
+  }
+}

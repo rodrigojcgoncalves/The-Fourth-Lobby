@@ -1,6 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Root from './components/layout/Root';
 import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
+import ResidentPage from './pages/ResidentPage';
 import EventDetailsPage from './pages/EventDetailsPage';
 import TicketsPage from './pages/TicketsPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -27,6 +29,8 @@ export const router = createBrowserRouter([
     element: <Root />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: 'about', element: <AboutPage /> },
+      { path: 'residents/:slug', element: <ResidentPage /> },
       { path: 'login', element: <LoginPage /> },
       
       // Rotas Protegidas - Cliente

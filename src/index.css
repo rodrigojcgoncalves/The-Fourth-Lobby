@@ -17,7 +17,7 @@
   --neon-magenta: #c0392b;        /* Vermelho mais fundo para acentos */
 
   /* ── Fundo e Glassmorphism ───────────────────────────────────────────── */
-  --background:        #0a0a0c;
+  --background:        #000000;
   --glass-bg:          rgba(18, 10, 10, 0.65);
   --glass-border:      var(--primary-border);
   --card-background:   rgba(28, 14, 14, 0.8);

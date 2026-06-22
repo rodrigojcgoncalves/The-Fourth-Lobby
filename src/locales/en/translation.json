@@ -1,0 +1,70 @@
+{
+  "nav": {
+    "about": "About Us",
+    "tickets": "Tickets",
+    "promoter": "Promoter Portal",
+    "organizer": "Organizer",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero_subtitle": "Where the Fourth Dimension begins...",
+    "btn_about": "About Us",
+    "upcoming": "Upcoming Events",
+    "no_events": "No upcoming events at the moment.",
+    "media": "Media Center"
+  },
+  "about": {
+    "hero_title": "The Fourth Dimension",
+    "hero_subtitle": "Elevating the rave experience to another realm.",
+    "story_title": "Our Story",
+    "story_p1": "4th Dimension was born in Covilhã with the purpose of filling a void in the Beira Interior region, bringing underground culture to an area where Hard Techno was largely unexplored. Focused on today's fastest and most energetic subgenres, our identity travels through Schranz, dark Industrial, and the highly rhythmic sides of Hardgroove and Hardbounce.",
+    "story_p2": "More than organizing parties in the snow city, we create a space of freedom, connection, and pure rave energy, elevating each event to an experience in another dimension. Our commitment to the future is to consolidate the label as a reference in the interior of Portugal, driving the regional techno scene and serving as a stage for new talents.",
+    "residents_title": "Our Residents",
+    "resident_role": "Resident DJ"
+  },
+  "login": {
+    "title": "Welcome to the Lobby",
+    "email": "Email",
+    "password": "Password",
+    "btn_login": "Enter Dimension",
+    "logging_in": "Entering...",
+    "error": "Failed to login. Please check your credentials."
+  },
+  "residents_bio": {
+    "ronii": [
+      "RØNII is a force of Hard Techno in the interior of the country. Based in Covilhã, where he is the co-founder of the 4th Dimension project, his name is synonymous with high-intensity sets and a diversity of subgenres, ranging from Psy and Reverse Bass to elements of Raw and Industrial.",
+      "His great differential, besides the focus on fat kicks, is the ability to implement Schranz elements in most of the styles he plays, creating a unique mix on the dancefloor.",
+      "His first contact with the decks was in 2024, driven by the desire to deepen his knowledge of electronic music. The passion quickly escalated to the stages, moved by the goal of delivering that energy directly to the public.",
+      "After his debut, he quickly reached the national circuit, performing in booths and events such as Riktus, Estrago, Komplex, Spektroom, Companhia Club, VOID, and the Academic Week of Covilhã.",
+      "Inspired by artists like ECZODIA, Samuel Moriero, and ZEP, RØNII remains focused on evolving, now firmly entering the world of music production."
+    ],
+    "saf": [
+      "Simão Fraga, artistically known as SAF, is an emerging Portuguese DJ in the underground scene, currently residing in Covilhã. Member of the 4th Dimension collective.",
+      "His first contact with the decks happened in 2024, motivated by socializing with friends and informal parties, where he quickly discovered his passion for electronic music and the energy of the dancefloors.",
+      "With a sonic identity centered on HardBounce, characterized by intense kicks and an electric and involving groove, SAF stands out for his versatility and ability to adapt to the audience and the venue.",
+      "In his sets, he also explores genres like Hardgroove and Hard Techno, building dynamic performances always guided by reading the crowd.",
+      "His debut was at the 4th Dimension project in Covilhã, and he had appearances in several other events and venues like Komplex, Companhia Club, Void, and Caloiro AAUBI reception.",
+      "Inspired by artists like Adrián Mills, Cloudy, and the universe of the 240KM/H label, SAF seeks to create a contagious and participatory experience; where the public is not just a spectator, but an active part of the vibe. With energetic sets full of personality, he mixes well-known tracks with catchy vocals, promoting a direct connection between the sound and the crowd: alive, intense, and always bouncing."
+    ],
+    "neket": [
+      "NËKËT embodies the raw energy of the new wave of underground techno in Portugal. Born in Covilhã, his journey began in early 2025, driven by a deep fascination for the technical precision and aggressive textures of Industrial and Hard Techno.",
+      "His rapid evolution led him to his first performance in May 2025, followed shortly after by a residency at 4th Dimension, where he has been fundamental in building the collective's sonic identity.",
+      "Influenced by the disruptive sounds of Vieze Asbak and the industrial weight of AZDAT, NËKËT rejects the predictable. His sets are a lesson in high-voltage storytelling, fusing Raw aesthetics with a relentless rhythm.",
+      "For NËKËT, the booth is a space for physical and atmospheric experimentation. Currently expanding his presence in the independent circuit, he remains true to the core values of club culture: intensity, technical mastery, and an unwavering connection to the underground."
+    ]
+  },
+  "resident_page": {
+    "back": "Back to About Us",
+    "follow": "Follow"
+  },
+  "footer": {
+    "tagline": "Where the Fourth Dimension begins",
+    "description": "Independent project based in Covilhã, bringing underground culture and the most energetic Hard Techno to Beira Interior.",
+    "navigate": "Navigate",
+    "contact": "Contact",
+    "follow": "Social Media",
+    "home": "Home",
+    "rights": "All rights reserved."
+  }
+}

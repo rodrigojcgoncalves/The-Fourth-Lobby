@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Event } from '../types';
 import EventCard from '../components/EventCard';
 import './HomePage.css';
@@ -15,6 +16,7 @@ export default function HomePage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function fetchEvents() {
@@ -32,8 +34,8 @@ export default function HomePage() {
     fetchEvents();
   }, []);
 
-  const handleGetTickets = () => {
-    navigate('/events');
+  const handleAboutUs = () => {
+    navigate('/about');
   };
 
   const now = new Date();
@@ -46,20 +48,20 @@ export default function HomePage() {
       <section className="hero" style={{ backgroundImage: `url(${heroBg})` }}>
         <div className="hero-content">
           <img src={logoFourthDimension} alt="Fourth Dimension" className="hero-logo" />
-          <p>Where the Fourth Dimension begins...</p>
-          <button className="btn-hero" onClick={handleGetTickets}>
-            Get Tickets Now
+          <p>{t('home.hero_subtitle')}</p>
+          <button className="btn-hero" onClick={handleAboutUs}>
+            {t('home.btn_about')}
           </button>
         </div>
       </section>
 
       {/* ── Upcoming Events ── */}
       <section className="home-section container">
-        <h2 className="section-title">Upcoming Events</h2>
+        <h2 className="section-title">{t('home.upcoming')}</h2>
         {loading ? (
           <p className="loading-text">Loading events...</p>
         ) : upcomingEvents.length === 0 ? (
-          <p className="loading-text">No upcoming events at the moment.</p>
+          <p className="loading-text">{t('home.no_events')}</p>
         ) : (
           <div className="events-grid">
             {upcomingEvents.map(event => (
@@ -71,7 +73,7 @@ export default function HomePage() {
 
       {/* ── Media Center ── */}
       <section className="home-section container">
-        <h2 className="section-title">Media Center</h2>
+        <h2 className="section-title">{t('home.media')}</h2>
         <div className="media-grid">
           <a href="#" className="media-item">
             <div className="media-image">

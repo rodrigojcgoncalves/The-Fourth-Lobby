@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useAuthStore } from '../store/authStore';
+import { useTranslation } from 'react-i18next';
 import logoIcon from '@img/fourthdimension_logo.png';
 import './LoginPage.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { setUser } = useAuthStore();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -61,7 +63,7 @@ export default function LoginPage() {
       <div className="login-container">
         <div className="login-card">
           <img src={logoIcon} alt="The Fourth Lobby" className="login-logo" />
-          <p className="login-subtitle">The Fourth Lobby</p>
+          <p className="login-subtitle">{t('login.title')}</p>
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-tabs">
@@ -91,7 +93,7 @@ export default function LoginPage() {
 
             <fieldset>
               <div className="form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t('login.email')}</label>
                 <input
                   type="email"
                   id="email"
@@ -120,7 +122,7 @@ export default function LoginPage() {
               )}
 
               <div className="form-group">
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">{t('login.password')}</label>
                 <input
                   type="password"
                   id="password"
@@ -142,7 +144,7 @@ export default function LoginPage() {
             )}
 
             <button type="submit" className="btn-primary btn-large" disabled={loading}>
-              {loading ? 'Loading...' : (isLogin ? 'Login' : 'Register')}
+              {loading ? t('login.logging_in') : (isLogin ? t('login.btn_login') : 'Register')}
             </button>
           </form>
 
