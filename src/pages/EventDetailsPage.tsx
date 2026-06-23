@@ -56,6 +56,8 @@ export default function EventDetailsPage() {
     );
   }
 
+  const isPastEvent = new Date(event.date) < new Date();
+
   const handleBuyTickets = (phase: any) => {
     navigate('/checkout', {
       state: {
@@ -137,44 +139,62 @@ export default function EventDetailsPage() {
 
         {/* Ticket Phases */}
         <section className="tickets-section">
-          <h2>Comprar Bilhetes</h2>
-          {event.ticket_types && event.ticket_types.length > 0 ? (
-            <div className="ticket-phases">
-              {event.ticket_types.map((phase: any) => {
-                // A API pública retorna 'availability' (string) em vez de quantidades
-                const isAvailable = phase.availability
-                  ? phase.availability === 'Disponível'
-                  : (phase.total_quantity - phase.sold_quantity) > 0;
-
-                return (
-                  <div key={phase.id} className="ticket-phase-card">
-                    <div className="phase-header">
-                      <h3>{phase.name}</h3>
-                      {isAvailable ? (
-                        <span className="badge-active">DISPONÍVEL</span>
-                      ) : (
-                        <span className="badge-inactive">ESGOTADO</span>
-                      )}
-                    </div>
-                    {phase.description && (
-                      <p className="phase-description">{phase.description}</p>
-                    )}
-                    <div className="phase-details">
-                      <p className="price">€{Number(phase.price).toFixed(2)}</p>
-                    </div>
-                    <button
-                      className="btn-primary"
-                      onClick={() => handleBuyTickets(phase)}
-                      disabled={!isAvailable}
-                    >
-                      {isAvailable ? 'Comprar Bilhete' : 'Esgotado'}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
+          {isPastEvent ? (
+            <>
+              <h2>Bilhetes</h2>
+              <div className="past-event-notice">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <div>
+                  <h3>Este evento já decorreu</h3>
+                  <p>A compra de bilhetes já não está disponível para eventos passados.</p>
+                </div>
+              </div>
+            </>
           ) : (
-            <p style={{ color: 'rgba(255,255,255,0.5)' }}>Bilhetes ainda não disponíveis.</p>
+            <>
+              <h2>Comprar Bilhetes</h2>
+              {event.ticket_types && event.ticket_types.length > 0 ? (
+                <div className="ticket-phases">
+                  {event.ticket_types.map((phase: any) => {
+                    // A API pública retorna 'availability' (string) em vez de quantidades
+                    const isAvailable = phase.availability
+                      ? phase.availability === 'Disponível'
+                      : (phase.total_quantity - phase.sold_quantity) > 0;
+
+                    return (
+                      <div key={phase.id} className="ticket-phase-card">
+                        <div className="phase-header">
+                          <h3>{phase.name}</h3>
+                          {isAvailable ? (
+                            <span className="badge-active">DISPONÍVEL</span>
+                          ) : (
+                            <span className="badge-inactive">ESGOTADO</span>
+                          )}
+                        </div>
+                        {phase.description && (
+                          <p className="phase-description">{phase.description}</p>
+                        )}
+                        <div className="phase-details">
+                          <p className="price">€{Number(phase.price).toFixed(2)}</p>
+                        </div>
+                        <button
+                          className="btn-primary"
+                          onClick={() => handleBuyTickets(phase)}
+                          disabled={!isAvailable}
+                        >
+                          {isAvailable ? 'Comprar Bilhete' : 'Esgotado'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p style={{ color: 'rgba(255,255,255,0.5)' }}>Bilhetes ainda não disponíveis.</p>
+              )}
+            </>
           )}
         </section>
       </div>

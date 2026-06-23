@@ -43,6 +43,21 @@ export default function CheckoutPage() {
     );
   }
 
+  // Bloquear checkout para eventos passados
+  if (new Date(state.eventDate) < new Date()) {
+    return (
+      <div className="container checkout-page">
+        <div style={{ paddingTop: '4rem', textAlign: 'center' }}>
+          <h2>Evento já decorreu</h2>
+          <p style={{ color: 'rgba(255,255,255,0.5)', margin: '1rem 0' }}>
+            Não é possível comprar bilhetes para eventos que já decorreram.
+          </p>
+          <button className="btn-primary" onClick={() => navigate('/')}>Ver Eventos</button>
+        </div>
+      </div>
+    );
+  }
+
   const baseTotal = state.price * quantity;
   const discountAmount = appliedPromo ? (baseTotal * (appliedPromo.discountPercent / 100)) : 0;
   const total = (baseTotal - discountAmount).toFixed(2);
@@ -104,6 +119,7 @@ export default function CheckoutPage() {
           orderId: data.order.id,
           tickets: data.order.tickets,
           eventName: state.eventName,
+          eventDate: state.eventDate,
           total: data.order.total_amount
         }
       });

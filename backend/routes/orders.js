@@ -68,6 +68,23 @@ router.post('/', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'Detalhes da fase de bilhete não encontrados.' });
     }
 
+    // ── VALIDAÇÃO: Bloquear compra para eventos passados ──────────────────
+    const { data: eventData, error: eventError } = await supabase
+      .from('events')
+      .select('date')
+      .eq('id', ticketType.event_id)
+      .single();
+
+    if (eventError || !eventData) {
+      await supabase.rpc('release_tickets', { p_ticket_type_id: ticket_type_id, p_quantity: quantity });
+      return res.status(404).json({ message: 'Evento não encontrado.' });
+    }
+
+    if (new Date(eventData.date) < new Date()) {
+      await supabase.rpc('release_tickets', { p_ticket_type_id: ticket_type_id, p_quantity: quantity });
+      return res.status(400).json({ message: 'Não é possível comprar bilhetes para eventos que já decorreram.' });
+    }
+
     let discountPercent = 0;
     let promoterId = null;
     let commissionRate = 0;

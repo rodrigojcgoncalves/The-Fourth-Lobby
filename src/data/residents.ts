@@ -5,13 +5,16 @@ import roniiBanner from '@img/artists/residents/ronii_banner.jpg';
 import safBanner from '@img/artists/residents/saf_banner.jpeg';
 import neketBanner from '@img/artists/residents/neket_banner.jpg';
 
+import margaridaImg from '@img/artists/residents/margarida.png';
+
 export interface Resident {
   slug: string;
   name: string;
   role: string;
   genres: string[];
   image: string;
-  bannerImage: string;
+  bannerImage?: string;
+  hiddenSearchTerms?: string[];
   socials: {
     instagram?: string;
     soundcloud?: string;
@@ -53,6 +56,17 @@ export const residents: Resident[] = [
     socials: {
       instagram: 'https://www.instagram.com/andre_neket/',
       soundcloud: 'https://soundcloud.com/neket-13'
+    }
+  },
+  {
+    slug: 'k40t1c4',
+    name: 'K40T1C4',
+    role: 'Co-founder BeiraTechnos',
+    genres: [],
+    image: margaridaImg,
+    hiddenSearchTerms: ['maggy'],
+    socials: {
+      instagram: 'https://www.instagram.com/maggy._.melicio/'
     }
   }
 ];

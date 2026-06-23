@@ -33,7 +33,7 @@ export default function AboutPage() {
       <section className="residents-section">
         <h2 className="section-title">{t('about.residents_title')}</h2>
         <div className="residents-grid">
-          {residents.map((resident, index) => (
+          {residents.filter(r => r.slug !== 'k40t1c4').map((resident, index) => (
             <Link to={`/residents/${resident.slug}`} className="resident-card" key={index} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="resident-image-container">
                 <img src={resident.image} alt={resident.name} className="resident-image" />

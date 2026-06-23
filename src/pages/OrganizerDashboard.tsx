@@ -1,12 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Event } from '../types';
+import '../components/DeleteEventModal.css';
 import './OrganizerDashboard.css';
 
 export default function OrganizerDashboard() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Modal State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<{id: string, name: string} | null>(null);
+  const [deleteInput, setDeleteInput] = useState('');
+  const [deleteStep, setDeleteStep] = useState<1 | 2>(1);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,19 +44,50 @@ export default function OrganizerDashboard() {
     fetchMyEvents();
   }, []);
 
-  const handleDelete = async (eventId: string, eventName: string) => {
-    if (!confirm(`Tens a certeza que queres apagar "${eventName}"? Esta ação é irreversível.`)) return;
+  const openDeleteModal = (eventId: string, eventName: string) => {
+    setEventToDelete({ id: eventId, name: eventName });
+    setDeleteStep(1);
+    setDeleteInput('');
+    setDeleteModalOpen(true);
+  };
 
-    const token = localStorage.getItem('jwt_token');
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${eventId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Erro ao apagar evento');
-      setEvents(prev => prev.filter(e => e.id !== eventId));
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao apagar');
+  const closeDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setEventToDelete(null);
+  };
+
+  const executeDelete = async () => {
+    if (!eventToDelete) return;
+    
+    if (deleteStep === 1) {
+      setDeleteStep(2);
+      return;
+    }
+
+    if (deleteStep === 2) {
+      if (deleteInput !== eventToDelete.name) {
+        alert('Nome incorreto. Operação abortada.');
+        return;
+      }
+
+      const token = localStorage.getItem('jwt_token');
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${eventToDelete.id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          throw new Error(errorData?.message || 'Erro ao apagar evento');
+        }
+        
+        setEvents(prev => prev.filter(e => e.id !== eventToDelete.id));
+        closeDeleteModal();
+      } catch (err) {
+        alert(err instanceof Error ? err.message : 'Erro ao apagar');
+        closeDeleteModal();
+      }
     }
   };
 
@@ -148,7 +187,7 @@ export default function OrganizerDashboard() {
                       )}
                       <button
                         className="btn-action btn-delete"
-                        onClick={() => handleDelete(event.id, event.name)}
+                        onClick={() => openDeleteModal(event.id, event.name)}
                         title="Apagar evento"
                       >
                         🗑 Apagar
@@ -161,6 +200,53 @@ export default function OrganizerDashboard() {
           </table>
         )}
       </section>
+
+      {deleteModalOpen && eventToDelete && (
+        <div className="delete-modal-overlay" onClick={closeDeleteModal}>
+          <div className="delete-modal-box" onClick={e => e.stopPropagation()}>
+            <button className="delete-modal-close" onClick={closeDeleteModal}>×</button>
+            
+            <div className="delete-modal-icon">🗑️</div>
+            <h2 className="delete-modal-title">Apagar Evento</h2>
+
+            <div className="delete-modal-step" key={deleteStep}>
+              <div className="delete-modal-body">
+                {deleteStep === 1 ? (
+                  <p>Tem a certeza que deseja <span className="danger-word">APAGAR</span> este evento? Esta ação é irreversível.</p>
+                ) : (
+                  <>
+                    <p>Para apagar este evento <span className="danger-word">DEFINITIVAMENTE</span>, escreva aqui o nome do evento:</p>
+                    <p style={{ marginTop: '0.5rem' }}><span className="event-name-highlight">{eventToDelete.name}</span></p>
+                    <input
+                      type="text"
+                      className="delete-modal-input"
+                      value={deleteInput}
+                      onChange={e => setDeleteInput(e.target.value)}
+                      placeholder="Nome do evento..."
+                      autoFocus
+                    />
+                  </>
+                )}
+              </div>
+            </div>
+
+            <hr className="delete-modal-divider" />
+
+            <div className="delete-modal-actions">
+              <button className="delete-modal-btn cancel" onClick={closeDeleteModal}>
+                {deleteStep === 1 ? 'Cancelar' : 'ABORTAR'}
+              </button>
+              <button
+                className="delete-modal-btn danger"
+                onClick={executeDelete}
+                disabled={deleteStep === 2 && deleteInput !== eventToDelete.name}
+              >
+                {deleteStep === 1 ? 'Continuar' : 'APAGAR'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

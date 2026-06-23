@@ -1,0 +1,219 @@
+/* ══════════════════════════════════════
+   DELETE EVENT MODAL — Premium Dark Design
+══════════════════════════════════════ */
+
+.delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  animation: overlayFadeIn 0.3s ease forwards;
+}
+
+@keyframes overlayFadeIn {
+  to {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+  }
+}
+
+.delete-modal-box {
+  position: relative;
+  width: 90%;
+  max-width: 460px;
+  background: linear-gradient(145deg, #1a1014, #0d0a0c);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 20px;
+  padding: 2.5rem 2rem 2rem;
+  box-shadow:
+    0 0 60px rgba(239, 68, 68, 0.08),
+    0 25px 50px rgba(0, 0, 0, 0.6);
+  animation: modalSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(30px) scale(0.95);
+}
+
+@keyframes modalSlideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Close Button ── */
+.delete-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.delete-modal-close:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ── Icon ── */
+.delete-modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin: 0 auto 1.25rem;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.15); }
+  50% { box-shadow: 0 0 20px 4px rgba(239, 68, 68, 0.1); }
+}
+
+/* ── Title ── */
+.delete-modal-title {
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin: 0 0 1rem;
+  letter-spacing: 0.02em;
+}
+
+/* ── Body ── */
+.delete-modal-body {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.delete-modal-body .danger-word {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.delete-modal-body .event-name-highlight {
+  color: #00d4ff;
+  font-weight: 700;
+}
+
+/* ── Input ── */
+.delete-modal-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  margin-top: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  animation: inputFadeIn 0.3s ease 0.15s both;
+}
+
+@keyframes inputFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.delete-modal-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.delete-modal-input:focus {
+  outline: none;
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.1);
+}
+
+/* ── Divider ── */
+.delete-modal-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(239, 68, 68, 0.15), transparent);
+  margin: 1.5rem 0;
+  border: none;
+}
+
+/* ── Actions ── */
+.delete-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.delete-modal-btn {
+  flex: 1;
+  padding: 0.8rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: none;
+  font-family: inherit;
+}
+
+/* Cancel / Abort */
+.delete-modal-btn.cancel {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.delete-modal-btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Continue / Delete */
+.delete-modal-btn.danger {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
+}
+
+.delete-modal-btn.danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+
+.delete-modal-btn.danger:disabled {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ── Step Transition ── */
+.delete-modal-step {
+  animation: stepFadeIn 0.25s ease;
+}
+
+@keyframes stepFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

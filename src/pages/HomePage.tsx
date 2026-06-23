@@ -75,7 +75,7 @@ export default function HomePage() {
       <section className="home-section container">
         <h2 className="section-title">{t('home.media')}</h2>
         <div className="media-grid">
-          <a href="#" className="media-item">
+          <a href="https://drive.google.com/drive/folders/1n9QdjQA87spRBt32KAXz-Prq_OHoFcdg?usp=drive_link" target="_blank" rel="noopener noreferrer" className="media-item">
             <div className="media-image">
               <img src={albumPhoto} alt="4TH x DW Album Photos" />
               <div className="media-badge">PHOTO</div>
@@ -86,7 +86,7 @@ export default function HomePage() {
             </div>
           </a>
 
-          <a href="#" className="media-item">
+          <a href="https://www.youtube.com/watch?v=C3AQKPIRjFo&t" target="_blank" rel="noopener noreferrer" className="media-item">
             <div className="media-image">
               <img src={rebbelleThumb} alt="Rebbelle Opening Set" />
               <div className="media-badge">SET</div>
@@ -97,7 +97,7 @@ export default function HomePage() {
             </div>
           </a>
 
-          <a href="#" className="media-item">
+          <a href="https://www.youtube.com/watch?v=nsc4cM4CQPw" target="_blank" rel="noopener noreferrer" className="media-item">
             <div className="media-image">
               <img src={pharahThumb} alt="Pharah Closing Set" />
               <div className="media-badge">SET</div>

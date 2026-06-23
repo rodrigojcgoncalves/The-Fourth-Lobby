@@ -146,3 +146,9 @@ select:focus {
   flex: 1;
   width: 100%;
 }
+
+.root-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

@@ -52,6 +52,10 @@
       "A sua rápida evolução levou-o à sua primeira atuação em maio de 2025, seguida pouco depois por uma residência na 4th Dimension, onde tem sido fundamental na construção da identidade sonora do coletivo.",
       "Influenciado pelas sonoridades disruptivas de Vieze Asbak e pelo peso industrial de AZDAT, NËKËT rejeita o previsível. Os seus sets são uma lição de narrativa de alta voltagem, fundindo a estética Raw com um ritmo implacável.",
       "Para NËKËT, a cabine é um espaço de experimentação física e atmosférica. Atualmente a expandir a sua presença no circuito independente, mantém-se fiel aos valores fundamentais da cultura de clube: intensidade, domínio técnico e uma ligação inabalável ao underground."
+    ],
+    "k40t1c4": [
+      "K40T1C4, original de Portimão, é uma jovem que já percorreu várias terras, absorvendo conhecimento e cultura por onde passava. Atualmente está baseada na Guarda, de onde se desloca frequentemente para a Covilhã, cidade onde é cofundadora do projeto BeiraTechnos.",
+      "Carrega consigo uma imensa bagagem e conhecimento do underground da cena eletrónica portuguesa. Impulsionada por essa experiência, criou também a label BARGHAIN, que faz parte da BeiraTechnos. Sediados no 'Nosso Bar', na Covilhã, realizam eventos mensais durante o período letivo, servindo de palco para DJs do circuito underground."
     ]
   },
   "resident_page": {
@@ -66,5 +70,16 @@
     "follow": "Redes Sociais",
     "home": "Início",
     "rights": "Todos os direitos reservados."
+  },
+  "success_page": {
+    "title": "Pagamento Bem Sucedido!",
+    "subtitle": "Os teus bilhetes foram confirmados e enviados para o teu email.",
+    "order_id": "ID da Encomenda:",
+    "amount": "Valor Pago:",
+    "event": "Evento:",
+    "date": "Data:",
+    "btn_view": "Ver Os Meus Bilhetes",
+    "btn_home": "Continuar a Explorar",
+    "redirecting": "A redirecionar para a página principal em 5 segundos..."
   }
 }

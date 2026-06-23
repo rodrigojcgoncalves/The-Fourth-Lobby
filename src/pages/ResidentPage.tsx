@@ -36,13 +36,15 @@ export default function ResidentPage() {
       </div>
 
       {/* ── HERO SECTION ── */}
-      <section className="resident-hero">
-        <div 
-          className="resident-hero-banner" 
-          style={{ backgroundImage: `url(${resident.bannerImage})` }}
-        ></div>
+      <section className={`resident-hero ${!resident.bannerImage ? 'no-banner' : ''}`}>
+        {resident.bannerImage && (
+          <div 
+            className="resident-hero-banner" 
+            style={{ backgroundImage: `url(${resident.bannerImage})` }}
+          ></div>
+        )}
         
-        <div className="resident-hero-content">
+        <div className={`resident-hero-content ${!resident.bannerImage ? 'centered' : ''}`}>
           <img src={resident.image} alt={resident.name} className="resident-profile-photo" />
           <div className="resident-header-info">
             <h1 className="resident-name-large">{resident.name}</h1>

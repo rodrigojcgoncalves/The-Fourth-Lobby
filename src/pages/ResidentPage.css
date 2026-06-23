@@ -75,6 +75,24 @@
   letter-spacing: 1px;
 }
 
+/* ── No Banner Easter Egg Layout ── */
+.resident-hero.no-banner {
+  margin-bottom: 2rem;
+  padding-top: 2rem;
+}
+
+.resident-hero-content.centered {
+  margin: 0 auto;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.resident-hero-content.centered .resident-header-info {
+  padding-bottom: 0;
+}
+
 /* ── Content ── */
 .resident-content {
   max-width: 800px;

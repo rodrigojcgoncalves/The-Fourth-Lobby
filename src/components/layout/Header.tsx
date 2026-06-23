@@ -70,7 +70,8 @@ export default function Header({ currentUser, onLogout }: HeaderProps) {
     setResidentResults(
       residents.filter(r => 
         normalize(r.name).includes(term) || 
-        r.genres.some(g => normalize(g).includes(term))
+        r.genres.some(g => normalize(g).includes(term)) ||
+        (r.hiddenSearchTerms && r.hiddenSearchTerms.some(ht => normalize(ht) === term))
       )
     );
   }, [searchTerm, allEvents]);

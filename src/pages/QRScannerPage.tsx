@@ -53,6 +53,15 @@ export default function QRScannerPage() {
       if (scanner) {
         scanner.clear().catch(console.error);
       }
+      // Force stop all camera tracks (html5-qrcode doesn't always release them)
+      const videos = document.querySelectorAll('#reader video');
+      videos.forEach(video => {
+        const mediaStream = (video as HTMLVideoElement).srcObject as MediaStream;
+        if (mediaStream) {
+          mediaStream.getTracks().forEach(track => track.stop());
+          (video as HTMLVideoElement).srcObject = null;
+        }
+      });
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, isScanning]);
