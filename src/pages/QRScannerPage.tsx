@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+import { ScanLine, ArrowLeft, RotateCcw } from 'lucide-react';
 import './QRScannerPage.css';
 
 interface ScannedTicket {
@@ -35,7 +36,6 @@ export default function QRScannerPage() {
 
       scanner.render(
         (decodedText) => {
-          // Quando o código é lido com sucesso
           setScannedCode(decodedText);
           setIsScanning(false);
           if (scanner) {
@@ -111,12 +111,32 @@ export default function QRScannerPage() {
     setIsScanning(true);
   };
 
+  // Determine result type
+  const getResultType = (): 'success' | 'warning' | 'error' => {
+    if (!error) return 'success';
+    if (scanResult?.status === 'used') return 'warning';
+    return 'error';
+  };
+
+  const getResultInfo = () => {
+    const type = getResultType();
+    switch (type) {
+      case 'success': return { icon: '✓', title: 'Bilhete Válido', subtitle: 'Entrada autorizada' };
+      case 'warning': return { icon: '⚠', title: 'Bilhete Já Utilizado', subtitle: 'Este bilhete já foi usado anteriormente' };
+      case 'error': return { icon: '✕', title: 'Bilhete Inválido', subtitle: error || 'Erro na validação' };
+    }
+  };
+
   if (!eventId) {
     return (
       <div className="container qr-scanner-page">
-        <div style={{ paddingTop: '4rem', textAlign: 'center' }}>
+        <div className="scanner-empty-state">
           <h2>Nenhum Evento Selecionado</h2>
-          <button className="btn-primary" onClick={() => navigate('/organizer')}>Voltar ao Dashboard</button>
+          <p>Seleciona um evento no dashboard para começar a digitalizar bilhetes.</p>
+          <button className="btn-back" onClick={() => navigate('/organizer')}>
+            <ArrowLeft size={16} />
+            Voltar ao Dashboard
+          </button>
         </div>
       </div>
     );
@@ -124,57 +144,86 @@ export default function QRScannerPage() {
 
   return (
     <div className="container qr-scanner-page">
-      <h1>QR Code Scanner</h1>
-      <p className="subtitle">Lê os bilhetes para validar a entrada no evento</p>
+      <div className="scanner-header">
+        <h1>
+          <ScanLine size={24} />
+          QR Code Scanner
+        </h1>
+        <p className="scanner-subtitle">Lê os bilhetes para validar a entrada no evento</p>
+      </div>
 
       <div className="scanner-container">
         {isScanning ? (
-          <div className="scanner-box" style={{ background: '#fff', color: '#000', borderRadius: '12px', overflow: 'hidden' }}>
-            <div id="reader" style={{ width: '100%', border: 'none' }}></div>
+          <div className="scanner-viewport">
+            <div className="scanner-inner">
+              <div id="reader"></div>
+            </div>
+            <div className="scanner-status">
+              <span className="pulse-dot"></span>
+              A aguardar leitura de QR Code...
+            </div>
           </div>
         ) : (
-          <div className="scan-actions" style={{ marginBottom: '2rem', textAlign: 'center' }}>
-            <button className="btn-primary" onClick={resetScanner}>Digitalizar Próximo Bilhete</button>
+          <div className="scan-next-area">
+            <button className="btn-scan-next" onClick={resetScanner}>
+              <RotateCcw size={16} />
+              Digitalizar Próximo Bilhete
+            </button>
           </div>
         )}
 
-        {scannedCode && scanResult && (
-          <div className={`scan-result ${error ? (scanResult.status === 'used' ? 'warning' : 'error') : 'success'}`}>
-            <h3>
-              {error ? (scanResult.status === 'used' ? '⚠️ Bilhete Já Utilizado' : '❌ Bilhete Inválido') : '✓ Bilhete Válido'}
-            </h3>
-            {message && <p style={{ marginBottom: '1rem', opacity: 0.8 }}>{message}</p>}
-            {error && <p style={{ marginBottom: '1rem', color: '#ff4d4f' }}>{error}</p>}
-            
-            <div className="result-info">
-              <div className="info-row">
-                <span className="label">Código:</span>
-                <span className="value">{scannedCode}</span>
+        {scannedCode && scanResult && (() => {
+          const info = getResultInfo();
+          const type = getResultType();
+          return (
+            <div className={`scan-result-card ${type}`}>
+              <div className="result-banner">
+                <div className="result-icon">{info.icon}</div>
+                <div className="result-text">
+                  <h3>{info.title}</h3>
+                  <p>{info.subtitle}</p>
+                </div>
               </div>
-              <div className="info-row">
-                <span className="label">Titular:</span>
-                <span className="value">{scanResult.users?.full_name || scanResult.users?.email || 'N/A'}</span>
+              <div className="result-details">
+                <div className="detail-row">
+                  <span className="detail-label">Código</span>
+                  <span className="detail-value" style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{scannedCode}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Titular</span>
+                  <span className="detail-value">{scanResult.users?.full_name || scanResult.users?.email || 'N/A'}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Fase</span>
+                  <span className="detail-value">{scanResult.ticket_types?.name || 'N/A'}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Estado</span>
+                  <span className={`status-pill ${scanResult.status}`}>
+                    {scanResult.status.toUpperCase()}
+                  </span>
+                </div>
               </div>
-              <div className="info-row">
-                <span className="label">Fase:</span>
-                <span className="value">{scanResult.ticket_types?.name || 'N/A'}</span>
+            </div>
+          );
+        })()}
+
+        {scannedCode && !scanResult && error && (
+          <div className="scan-result-card error">
+            <div className="result-banner">
+              <div className="result-icon">✕</div>
+              <div className="result-text">
+                <h3>Inválido</h3>
+                <p>{error}</p>
               </div>
-              <div className="info-row">
-                <span className="label">Estado Atual:</span>
-                <span className={`value status-${scanResult.status}`}>
-                  {scanResult.status.toUpperCase()}
-                </span>
+            </div>
+            <div className="result-details">
+              <div className="detail-row">
+                <span className="detail-label">Código Lido</span>
+                <span className="detail-value" style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{scannedCode}</span>
               </div>
             </div>
           </div>
-        )}
-
-        {scannedCode && !scanResult && error && (
-           <div className="scan-result error">
-             <h3>❌ Inválido</h3>
-             <p>{error}</p>
-             <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.5 }}>Código: {scannedCode}</p>
-           </div>
         )}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CalendarDays, CheckCircle2, FileEdit, Settings, ExternalLink, Globe, EyeOff, Trash2 } from 'lucide-react';
 import { Event } from '../types';
 import '../components/DeleteEventModal.css';
 import './OrganizerDashboard.css';
@@ -91,6 +92,21 @@ export default function OrganizerDashboard() {
     }
   };
 
+  const toggleVisibility = async (eventId: string, currentStatus: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events/${eventId}/toggle-visibility`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Erro ao alterar visibilidade');
+      const data = await res.json();
+      setEvents(prev => prev.map(e => e.id === eventId ? { ...e, status: data.status } : e));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro');
+    }
+  };
+
   const publishedCount = events.filter(e => e.status === 'published').length;
   const draftCount = events.filter(e => e.status === 'draft').length;
 
@@ -104,7 +120,9 @@ export default function OrganizerDashboard() {
 
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon">🎪</div>
+          <div className="stat-icon">
+            <CalendarDays size={20} />
+          </div>
           <div className="stat-content">
             <p className="stat-label">Total de Eventos</p>
             <p className="stat-value">{events.length}</p>
@@ -112,7 +130,9 @@ export default function OrganizerDashboard() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon">✅</div>
+          <div className="stat-icon">
+            <CheckCircle2 size={20} />
+          </div>
           <div className="stat-content">
             <p className="stat-label">Publicados</p>
             <p className="stat-value">{publishedCount}</p>
@@ -120,7 +140,9 @@ export default function OrganizerDashboard() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon">📝</div>
+          <div className="stat-icon">
+            <FileEdit size={20} />
+          </div>
           <div className="stat-content">
             <p className="stat-label">Rascunhos</p>
             <p className="stat-value">{draftCount}</p>
@@ -130,7 +152,7 @@ export default function OrganizerDashboard() {
 
       <section className="dashboard-section">
         {loading ? (
-          <p style={{ color: 'rgba(255,255,255,0.5)' }}>A carregar os teus eventos...</p>
+          <p style={{ color: 'var(--org-text-tertiary)' }}>A carregar os teus eventos...</p>
         ) : events.length === 0 ? (
           <div className="empty-state">
             <p>Ainda não criaste nenhum evento.</p>
@@ -172,25 +194,35 @@ export default function OrganizerDashboard() {
                       <button
                         className="btn-action btn-view"
                         onClick={() => navigate(`/organizer/events/${event.id}`)}
-                        title="Gerir Evento (Dashboard Interno)"
+                        title="Gerir Evento"
                       >
-                        ⚙️ Gerir
+                        <Settings size={14} />
+                        Gerir
                       </button>
                       {event.slug && (
                         <button
-                          className="btn-action btn-secondary"
-                          onClick={() => navigate(`/events/${event.slug}`)}
-                          title="Ver página pública"
+                          className="btn-action btn-open-link"
+                          onClick={() => window.open(`/events/${event.slug}`, '_blank')}
+                          title="Abrir página pública"
                         >
-                          👁 Público
+                          <ExternalLink size={14} />
                         </button>
                       )}
+                      <button
+                        className={`btn-action btn-visibility ${event.status === 'published' ? 'published' : 'unlisted'}`}
+                        onClick={() => toggleVisibility(event.id, event.status)}
+                        title={event.status === 'published' ? 'Clica para tornar Não Listado' : 'Clica para Publicar'}
+                      >
+                        {event.status === 'published' ? <Globe size={14} /> : <EyeOff size={14} />}
+                        {event.status === 'published' ? 'Público' : 'Não Listado'}
+                      </button>
                       <button
                         className="btn-action btn-delete"
                         onClick={() => openDeleteModal(event.id, event.name)}
                         title="Apagar evento"
                       >
-                        🗑 Apagar
+                        <Trash2 size={14} />
+                        Apagar
                       </button>
                     </div>
                   </td>
@@ -206,7 +238,7 @@ export default function OrganizerDashboard() {
           <div className="delete-modal-box" onClick={e => e.stopPropagation()}>
             <button className="delete-modal-close" onClick={closeDeleteModal}>×</button>
             
-            <div className="delete-modal-icon">🗑️</div>
+            <div className="delete-modal-icon"><Trash2 size={24} /></div>
             <h2 className="delete-modal-title">Apagar Evento</h2>
 
             <div className="delete-modal-step" key={deleteStep}>

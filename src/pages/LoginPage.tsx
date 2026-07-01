@@ -25,6 +25,14 @@ export default function LoginPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Validação de password
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) return 'A password deve ter no mínimo 8 caracteres.';
+    if (!/[A-Z]/.test(password)) return 'A password deve conter pelo menos uma letra maiúscula.';
+    if (!/[0-9]/.test(password)) return 'A password deve conter pelo menos um número.';
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -35,6 +43,13 @@ export default function LoginPage() {
       if (isLogin) {
         loggedUser = await authService.login(formData.email, formData.password);
       } else {
+        // Validar segurança da password antes do registo
+        const passwordError = validatePassword(formData.password);
+        if (passwordError) {
+          setError(passwordError);
+          setLoading(false);
+          return;
+        }
         // O role é sempre 'customer' no registo público
         const role = 'customer';
         const data = await authService.register(formData.email, formData.password, formData.fullName, role);
@@ -133,6 +148,19 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   disabled={loading}
                 />
+                {!isLogin && formData.password.length > 0 && (
+                  <div className="password-requirements">
+                    <p style={{ color: formData.password.length >= 8 ? '#4ade80' : '#ff6b6b', fontSize: '0.8rem', margin: '0.25rem 0' }}>
+                      {formData.password.length >= 8 ? '✓' : '✗'} Mínimo 8 caracteres
+                    </p>
+                    <p style={{ color: /[A-Z]/.test(formData.password) ? '#4ade80' : '#ff6b6b', fontSize: '0.8rem', margin: '0.25rem 0' }}>
+                      {/[A-Z]/.test(formData.password) ? '✓' : '✗'} Pelo menos uma maiúscula
+                    </p>
+                    <p style={{ color: /[0-9]/.test(formData.password) ? '#4ade80' : '#ff6b6b', fontSize: '0.8rem', margin: '0.25rem 0' }}>
+                      {/[0-9]/.test(formData.password) ? '✓' : '✗'} Pelo menos um número
+                    </p>
+                  </div>
+                )}
               </div>
             </fieldset>
 

@@ -17,24 +17,26 @@ Frontend (React/Vite) → API REST (Node.js/Express) → Supabase (PostgreSQL)
 ## Stack Tecnológico
 
 ### Frontend
-| Tecnologia | Função |
-|---|---|
-| React 18 + TypeScript | Framework de UI |
-| Vite | Build tool e servidor de desenvolvimento |
-| Vitest + RTL | Testes Unitários e de Integração |
-| React Router v6 | Routing client-side |
-| Zustand | Gestão de estado global |
-| qrcode.react | Geração de QR Codes para bilhetes |
-| Lucide React | Biblioteca de ícones |
+
+| Tecnologia            | Função                                   |
+| --------------------- | ---------------------------------------- |
+| React 18 + TypeScript | Framework de UI                          |
+| Vite                  | Build tool e servidor de desenvolvimento |
+| Vitest + RTL          | Testes Unitários e de Integração         |
+| React Router v6       | Routing client-side                      |
+| Zustand               | Gestão de estado global                  |
+| qrcode.react          | Geração de QR Codes para bilhetes        |
+| Lucide React          | Biblioteca de ícones                     |
 
 ### Backend
-| Tecnologia | Função |
-|---|---|
-| Node.js + Express | Servidor REST API |
-| Jest + Supertest | Testes Unitários e de Integração da API |
-| Supabase JS SDK | Cliente de base de dados (PostgreSQL) |
-| Supabase Storage | Upload de imagens |
-| JSON Web Tokens | Autenticação |
+
+| Tecnologia        | Função                                  |
+| ----------------- | --------------------------------------- |
+| Node.js + Express | Servidor REST API                       |
+| Jest + Supertest  | Testes Unitários e de Integração da API |
+| Supabase JS SDK   | Cliente de base de dados (PostgreSQL)   |
+| Supabase Storage  | Upload de imagens                       |
+| JSON Web Tokens   | Autenticação                            |
 
 ---
 
@@ -89,7 +91,7 @@ node server.js
 
 ### 4. Executar os Testes Unitários
 
-O projeto utiliza um paradigma *Test Driven Development* (TDD) para estabilidade a longo prazo.
+O projeto utiliza um paradigma _Test Driven Development_ (TDD) para estabilidade a longo prazo.
 
 ```bash
 # Testes do Backend (Jest)
@@ -133,31 +135,31 @@ the-fourth-lobby/
 
 O controlo de acessos é aplicado no backend via middleware. São suportados três roles:
 
-| Role | Permissões |
-|---|---|
-| `customer` | Ver eventos, comprar bilhetes, consultar os seus próprios bilhetes |
-| `promoter` | Consultar métricas de vendas de eventos aos quais está associado |
-| `organizer` | Gestão completa de eventos, artistas, despesas e estatísticas |
+| Role        | Permissões                                                         |
+| ----------- | ------------------------------------------------------------------ |
+| `customer`  | Ver eventos, comprar bilhetes, consultar os seus próprios bilhetes |
+| `promoter`  | Consultar métricas de vendas de eventos aos quais está associado   |
+| `organizer` | Gestão completa de eventos, artistas, despesas e estatísticas      |
 
 ---
 
 ## Endpoints da API
 
-| Método | Endpoint | Auth | Descrição |
-|---|---|---|---|
-| POST | `/api/auth/register` | — | Criar conta |
-| POST | `/api/auth/login` | — | Autenticar, receber JWT |
-| GET | `/api/events` | — | Listar eventos publicados |
-| POST | `/api/events` | Organizador | Criar evento |
-| POST | `/api/events/:id/upload-image` | Organizador | Upload de capa do evento |
-| GET | `/api/tickets/my` | Cliente | Consultar bilhetes próprios |
-| POST | `/api/tickets/purchase` | Cliente | Comprar bilhete |
-| GET | `/api/promoters/verify/:code` | Cliente Autenticado | Verifica a validade de um código de desconto de RP |
-| GET | `/api/promoters/dashboard` | Promotor | Dashboard com métricas de vendas, comissões ganhas e eventos da sua label |
-| GET | `/api/expenses/event/:id` | Organizador | Listar despesas de um evento |
-| POST | `/api/expenses/event/:id` | Organizador | Adicionar despesa |
-| PATCH | `/api/expenses/:id/toggle-paid` | Organizador | Alternar estado pago/pendente |
-| DELETE | `/api/expenses/:id` | Organizador | Apagar despesa |
+| Método | Endpoint                        | Auth                | Descrição                                                                 |
+| ------ | ------------------------------- | ------------------- | ------------------------------------------------------------------------- |
+| POST   | `/api/auth/register`            | —                   | Criar conta                                                               |
+| POST   | `/api/auth/login`               | —                   | Autenticar, receber JWT                                                   |
+| GET    | `/api/events`                   | —                   | Listar eventos publicados                                                 |
+| POST   | `/api/events`                   | Organizador         | Criar evento                                                              |
+| POST   | `/api/events/:id/upload-image`  | Organizador         | Upload de capa do evento                                                  |
+| GET    | `/api/tickets/my`               | Cliente             | Consultar bilhetes próprios                                               |
+| POST   | `/api/tickets/purchase`         | Cliente             | Comprar bilhete                                                           |
+| GET    | `/api/promoters/verify/:code`   | Cliente Autenticado | Verifica a validade de um código de desconto de RP                        |
+| GET    | `/api/promoters/dashboard`      | Promotor            | Dashboard com métricas de vendas, comissões ganhas e eventos da sua label |
+| GET    | `/api/expenses/event/:id`       | Organizador         | Listar despesas de um evento                                              |
+| POST   | `/api/expenses/event/:id`       | Organizador         | Adicionar despesa                                                         |
+| PATCH  | `/api/expenses/:id/toggle-paid` | Organizador         | Alternar estado pago/pendente                                             |
+| DELETE | `/api/expenses/:id`             | Organizador         | Apagar despesa                                                            |
 
 ---
 

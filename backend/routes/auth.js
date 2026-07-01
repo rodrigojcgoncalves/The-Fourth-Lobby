@@ -13,6 +13,17 @@ router.post('/register', async (req, res) => {
   const role = 'customer'; // Role é SEMPRE 'customer' no registo público. Nunca confiar no cliente.
 
   try {
+    // 0. Validação de segurança da password
+    if (!password || password.length < 8) {
+      return res.status(400).json({ message: 'A password deve ter no mínimo 8 caracteres.' });
+    }
+    if (!/[A-Z]/.test(password)) {
+      return res.status(400).json({ message: 'A password deve conter pelo menos uma letra maiúscula.' });
+    }
+    if (!/[0-9]/.test(password)) {
+      return res.status(400).json({ message: 'A password deve conter pelo menos um número.' });
+    }
+
     // 1. Check if user already exists
     const { data: existingUser } = await supabase
       .from('users')

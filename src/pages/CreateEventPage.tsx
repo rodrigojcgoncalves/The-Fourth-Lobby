@@ -89,6 +89,13 @@ export default function CreateEventPage() {
       setError('Preenche os campos obrigatórios.');
       return;
     }
+    // Validação: não permitir datas no passado
+    const eventDate = new Date(date);
+    const now = new Date();
+    if (eventDate < now) {
+      setError('A data do evento não pode ser no passado.');
+      return;
+    }
     if (!imageFile) {
       setError('É obrigatório fazer upload do cartaz do evento.');
       return;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import './OrganizerTeamPage.css'; // Vamos criar os estilos se necessário ou reutilizar
+import { Mail, Copy, Ticket } from 'lucide-react';
+import './OrganizerTeamPage.css';
 
 interface Promoter {
   id: string;
@@ -68,7 +69,7 @@ export default function OrganizerTeamPage() {
 
       setInviteSuccess(data.message);
       setInviteEmail('');
-      fetchTeam(); // Recarregar a equipa
+      fetchTeam();
 
     } catch (err: any) {
       setInviteError(err.message);
@@ -113,71 +114,64 @@ export default function OrganizerTeamPage() {
         <p className="subtitle">Adiciona novos promotores e acompanha o desempenho deles.</p>
       </div>
 
-      <div className="invite-section glass-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
+      <div className="invite-section">
         <h3>Adicionar Promotor (RP)</h3>
-        <p style={{ opacity: 0.8, marginBottom: '1rem', fontSize: '0.9rem' }}>
+        <p className="invite-description">
           O promotor já deve ter conta criada na plataforma. Insere o e-mail de registo dele para o adicionar à tua Label.
         </p>
-        <form onSubmit={handleInvite} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <form onSubmit={handleInvite} className="invite-form">
           <input
             type="email"
             placeholder="email@do-promotor.com"
             value={inviteEmail}
             onChange={(e) => setInviteEmail(e.target.value)}
-            style={{ flex: 1, padding: '0.75rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }}
+            className="invite-input"
             required
           />
           <button type="submit" className="btn-primary">Adicionar RP</button>
         </form>
-        {inviteError && <div style={{ color: 'var(--accent-red)', marginTop: '1rem' }}>{inviteError}</div>}
-        {inviteSuccess && <div style={{ color: 'var(--neon-cyan)', marginTop: '1rem' }}>{inviteSuccess}</div>}
+        {inviteError && <div className="invite-feedback error">{inviteError}</div>}
+        {inviteSuccess && <div className="invite-feedback success">{inviteSuccess}</div>}
       </div>
 
-      <div className="team-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+      <div className="team-grid">
         {team.length === 0 ? (
-          <p>Ainda não tens promotores na tua equipa.</p>
+          <p className="team-empty">Ainda não tens promotores na tua equipa.</p>
         ) : (
           team.map(member => (
-            <div key={member.id} className={`glass-card team-card ${member.status}`} style={{ padding: '1.5rem', opacity: member.status === 'inactive' ? 0.6 : 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0 }}>{member.full_name || 'Sem Nome'}</h3>
-                <span style={{ 
-                  padding: '0.2rem 0.5rem', 
-                  borderRadius: '10px', 
-                  fontSize: '0.8rem',
-                  background: member.status === 'active' ? 'rgba(0,255,0,0.1)' : 'rgba(255,0,0,0.1)',
-                  color: member.status === 'active' ? '#4ade80' : '#f87171'
-                }}>
+            <div key={member.id} className={`team-card ${member.status}`}>
+              <div className="team-card-header">
+                <h3>{member.full_name || 'Sem Nome'}</h3>
+                <span className={`team-status-badge ${member.status}`}>
                   {member.status.toUpperCase()}
                 </span>
               </div>
               
-              <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>
-                📧 {member.email}
+              <div className="team-card-email">
+                <Mail size={15} />
+                {member.email}
               </div>
 
-              <div style={{ marginBottom: '1.5rem', padding: '0.75rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span>Promocode:</span>
-                  <strong style={{ color: 'var(--neon-cyan)', cursor: 'pointer' }} onClick={() => copyToClipboard(member.referral_code)}>
-                    {member.referral_code} 📋
-                  </strong>
+              <div className="team-card-stats">
+                <div className="team-stat-row">
+                  <span>Promocode</span>
+                  <span className="promo-code" onClick={() => copyToClipboard(member.referral_code)}>
+                    {member.referral_code}
+                    <Copy size={14} />
+                  </span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Bilhetes Vendidos:</span>
+                <div className="team-stat-row">
+                  <span>Bilhetes Vendidos</span>
                   <strong>{member.tickets_sold}</strong>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button 
-                  className="btn-secondary" 
-                  style={{ flex: 1, padding: '0.5rem' }}
-                  onClick={() => handleToggleStatus(member.user_id, member.status)}
-                >
-                  {member.status === 'active' ? 'Suspender (Inativo)' : 'Reativar'}
-                </button>
-              </div>
+              <button 
+                className="team-toggle-btn"
+                onClick={() => handleToggleStatus(member.user_id, member.status)}
+              >
+                {member.status === 'active' ? 'Suspender (Inativo)' : 'Reativar'}
+              </button>
             </div>
           ))
         )}

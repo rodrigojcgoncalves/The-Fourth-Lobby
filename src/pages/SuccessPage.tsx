@@ -65,7 +65,7 @@ export default function SuccessPage() {
           <button onClick={() => navigate('/tickets')} className="btn-primary">
             {t('success_page.btn_view')}
           </button>
-          <button onClick={() => navigate('/')} className="btn-secondary">
+          <button onClick={() => navigate('/')} className="btn-primary">
             {t('success_page.btn_home')}
           </button>
         </div>

@@ -2,6 +2,19 @@ perguntas professor
 
 faz sentido este site ser exclusivo para a minha label? ao invés de ser um market place
 
+resumo de frases por IA não está funcional, está a emitir um placeholder
+
+experimentar um modelo exclusivo em português
+
+# adicionar ainda
+
+segurança nas palavras pass
+
+# Trabalho futuro
+
+implementar sistema de reembolso para eventos cancelados
+Adicionar mais métricas e estatísticas
+
 # 1. Criação da base de dados.
 
 ## Este foi o scrip usado no SQL Editor do supabase para a criação da Base de Dados
@@ -602,6 +615,12 @@ WITH CHECK (auth.uid() = owner_id);
 Criei conta na Hugging face, que é um "github" das IA, onde existem vários modelos de IA's disponiveis para serem usados por devs, o meu objetivo é usar um modelo de NLP pronto
 
 criei token com opção de READ e adicionei ao .env
+
+dificuldades encontradas: obter informações/dados como comentários do instagram ou do X precisam de uso de API's pagas
+a solução pensada para isso foi o uso de web scrapping, mas rapidamente foi por água a baixo após ter feito uma pesquisa e descobrir que sites como o Instagram são contra web scrapping nas suas políticas, banindo o IP de quem o fizer
+
+a solução para isso foi implementar uma nova feature: os users podem deixar um review duma festa
+após a data da festa, quando o user voltar ao app/site vai lhe aparecer um pop para avaliar a festa passada, deixando um comentário e avaliação com estrelas
 
 ## 2. Gestão de Estado com Zustand e a Autenticação
 

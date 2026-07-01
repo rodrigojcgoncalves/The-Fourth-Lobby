@@ -193,7 +193,7 @@ export default function CheckoutPage() {
               />
               <button 
                 type="button" 
-                className="btn-secondary" 
+                className="btn-primary" 
                 onClick={appliedPromo ? () => { setAppliedPromo(null); setPromoCodeInput(''); setPromoSuccess(null); } : handleVerifyPromo}
               >
                 {appliedPromo ? 'Remover' : 'Aplicar'}
@@ -212,7 +212,7 @@ export default function CheckoutPage() {
             <button type="submit" className="btn-primary checkout-button" disabled={loading}>
               {loading ? 'A processar...' : `✓ Confirmar Compra — €${total}`}
             </button>
-            <button type="button" className="btn-secondary" style={{ marginTop: '0.75rem', width: '100%' }} onClick={() => navigate(-1)}>
+            <button type="button" className="btn-primary" style={{ marginTop: '0.75rem', width: '100%' }} onClick={() => navigate(-1)}>
               ← Voltar
             </button>
           </form>

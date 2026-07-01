@@ -1,21 +1,256 @@
+/* ══════════════════════════════════════
+   ORGANIZER TEAM PAGE — Control Room
+══════════════════════════════════════ */
+
 .organizer-team-page {
-  padding: 2rem 0;
+  padding: 0.5rem 0 2rem;
+  animation: dashFadeIn 0.4s ease;
 }
 
-.page-header {
+/* ── Page Header ── */
+.organizer-team-page .page-header {
   margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--org-border, rgba(167, 139, 250, 0.08));
 }
 
+.organizer-team-page .page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--org-text-primary, #f0ecf9);
+  margin: 0 0 0.35rem;
+}
+
+.organizer-team-page .page-header .subtitle {
+  color: var(--org-text-secondary, rgba(240, 236, 249, 0.5));
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ── Invite Section ── */
+.invite-section {
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+  background: var(--org-surface-raised, #13102a);
+  border: 1px solid var(--org-border, rgba(167, 139, 250, 0.08));
+  border-radius: 14px;
+}
+
+.invite-section h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--org-text-primary, #f0ecf9);
+}
+
+.invite-description {
+  color: var(--org-text-secondary, rgba(240, 236, 249, 0.55));
+  margin-bottom: 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.invite-form {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.invite-input {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--org-text-primary, #fff);
+  border: 1px solid var(--org-border, rgba(167, 139, 250, 0.1));
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.invite-input::placeholder {
+  color: var(--org-text-tertiary, rgba(240, 236, 249, 0.25));
+}
+
+.invite-input:focus {
+  outline: none;
+  border-color: var(--org-accent, #a78bfa);
+}
+
+.invite-feedback {
+  margin-top: 0.85rem;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.invite-feedback.error {
+  color: var(--org-danger, #f87171);
+}
+
+.invite-feedback.success {
+  color: var(--org-success, #34d399);
+}
+
+/* ── Team Grid ── */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
+/* ── Team Card ── */
 .team-card {
-  transition: all 0.3s ease;
+  background: var(--org-surface-raised, #13102a);
+  border: 1px solid var(--org-border, rgba(167, 139, 250, 0.08));
+  border-radius: 14px;
+  padding: 1.5rem;
+  transition: all 0.25s ease;
+}
+
+.team-card:hover {
+  border-color: var(--org-border-hover, rgba(167, 139, 250, 0.18));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .team-card.inactive {
-  filter: grayscale(0.5);
+  opacity: 0.55;
+  filter: grayscale(0.3);
+}
+
+.team-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.team-card-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--org-text-primary, #f0ecf9);
+}
+
+.team-status-badge {
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.team-status-badge.active {
+  background: rgba(52, 211, 153, 0.08);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.15);
+}
+
+.team-status-badge.inactive,
+.team-status-badge.rejected {
+  background: rgba(248, 113, 113, 0.06);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.12);
+}
+
+.team-status-badge.pending {
+  background: rgba(251, 191, 36, 0.06);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.12);
+}
+
+.team-card-email {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.88rem;
+  color: var(--org-text-secondary, rgba(240, 236, 249, 0.6));
+}
+
+.team-card-email svg {
+  width: 15px;
+  height: 15px;
+  opacity: 0.5;
+}
+
+/* ── Promo Stats ── */
+.team-card-stats {
+  margin-bottom: 1.25rem;
+  padding: 0.85rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  border: 1px solid var(--org-border, rgba(167, 139, 250, 0.05));
+}
+
+.team-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  color: var(--org-text-secondary, rgba(240, 236, 249, 0.55));
+}
+
+.team-stat-row + .team-stat-row {
+  margin-top: 0.5rem;
+}
+
+.team-stat-row .promo-code {
+  color: var(--org-accent-bright, #c4b5fd);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.2s;
+}
+
+.team-stat-row .promo-code:hover {
+  color: var(--org-accent, #a78bfa);
+}
+
+.team-stat-row .promo-code svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+}
+
+.team-stat-row strong {
+  color: var(--org-text-primary, #f0ecf9);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Toggle Button ── */
+.team-toggle-btn {
+  width: 100%;
+  padding: 0.55rem;
+  background: transparent;
+  border: 1px solid var(--org-border, rgba(167, 139, 250, 0.12));
+  border-radius: 8px;
+  color: var(--org-text-secondary, rgba(240, 236, 249, 0.6));
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.team-toggle-btn:hover {
+  background: var(--org-accent-muted, rgba(167, 139, 250, 0.06));
+  border-color: var(--org-border-hover, rgba(167, 139, 250, 0.2));
+  color: var(--org-text-primary, #fff);
+}
+
+/* ── Empty Team ── */
+.team-empty {
+  color: var(--org-text-secondary, rgba(240, 236, 249, 0.4));
+  font-size: 0.92rem;
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--org-surface-raised, #13102a);
+  border: 1px solid var(--org-border, rgba(167, 139, 250, 0.06));
+  border-radius: 14px;
 }

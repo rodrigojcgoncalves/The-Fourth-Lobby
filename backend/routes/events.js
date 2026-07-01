@@ -176,6 +176,12 @@ router.post('/', verifyToken, requireRole('organizer'), async (req, res) => {
   const { name, description, date, location, capacity, image_url, status, phases, artists } = req.body;
 
   try {
+    // 0. Validação: não permitir criar eventos com datas no passado
+    const eventDate = new Date(date);
+    if (eventDate < new Date()) {
+      return res.status(400).json({ message: 'A data do evento não pode ser no passado.' });
+    }
+
     // 1. Gerar slug único
     const slug = await generateUniqueSlug(name);
 
@@ -278,6 +284,30 @@ router.get('/:id', async (req, res) => {
     res.json({ ...eventData, artists });
   } catch (err) {
     res.status(500).json({ message: 'Erro ao carregar evento.', error: err.message });
+  }
+});
+
+// PATCH /api/events/:id/toggle-visibility - Alternar entre publicado e não listado
+router.patch('/:id/toggle-visibility', verifyToken, requireRole('organizer'), async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { data: existing } = await supabase
+      .from('events')
+      .select('organizer_id, status')
+      .eq('id', id)
+      .single();
+
+    if (!existing || existing.organizer_id !== req.user.id) {
+      return res.status(403).json({ message: 'Sem permissão.' });
+    }
+
+    const newStatus = existing.status === 'published' ? 'draft' : 'published';
+    const { error } = await supabase.from('events').update({ status: newStatus }).eq('id', id);
+    if (error) throw error;
+
+    res.json({ status: newStatus });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao alterar visibilidade.', error: err.message });
   }
 });
 

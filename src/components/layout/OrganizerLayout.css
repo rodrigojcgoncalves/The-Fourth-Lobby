@@ -1,119 +1,217 @@
 /* ══════════════════════════════════════
-   ORGANIZER LAYOUT — Premium Purple Theme
+   ORGANIZER LAYOUT — "Control Room"
+   Distinctive sidebar + content shell
 ══════════════════════════════════════ */
 
 .organizer-layout {
-  /* Sobrescrever paleta para roxo */
-  --primary:        var(--org-primary);
-  --primary-dim:    var(--org-primary-dim);
-  --primary-glow:   var(--org-primary-glow);
-  --primary-border: var(--org-primary-border);
+  /* ── Token System ── */
+  --org-surface:        #0c0814;
+  --org-surface-raised: #13102a;
+  --org-surface-hover:  #1a1535;
+  --org-accent:         #a78bfa;
+  --org-accent-bright:  #c4b5fd;
+  --org-accent-muted:   rgba(167, 139, 250, 0.08);
+  --org-text-primary:   #f0ecf9;
+  --org-text-secondary: rgba(240, 236, 249, 0.5);
+  --org-text-tertiary:  rgba(240, 236, 249, 0.28);
+  --org-border:         rgba(167, 139, 250, 0.08);
+  --org-border-hover:   rgba(167, 139, 250, 0.18);
+  --org-success:        #34d399;
+  --org-warning:        #fbbf24;
+  --org-danger:         #f87171;
 
-  --glass-bg:       rgba(10, 6, 22, 0.7);
-  --glass-border:   rgba(124, 58, 237, 0.12);
-  --neon-cyan:      var(--org-primary);
+  /* Override inherited vars */
+  --primary:        var(--org-accent);
+  --primary-dim:    var(--org-accent-muted);
+  --primary-glow:   rgba(167, 139, 250, 0.35);
+  --primary-border: var(--org-border-hover);
+  --glass-bg:       var(--org-surface-raised);
+  --glass-border:   var(--org-border);
+  --neon-cyan:      var(--org-accent);
 
   display: flex;
   min-height: calc(100vh - 70px);
-  background-color: var(--background);
-  color: #fff;
+  background-color: var(--org-surface);
+  color: var(--org-text-primary);
 }
 
 /* ── Sidebar ── */
 .organizer-sidebar {
-  width: 240px;
-  background: rgba(10, 6, 22, 0.8);
-  border-right: 1px solid rgba(124, 58, 237, 0.1);
+  width: 260px;
+  background: linear-gradient(180deg, #0e0a1e 0%, #0a0716 100%);
+  border-right: 1px solid var(--org-border);
   display: flex;
   flex-direction: column;
-  padding: 2rem 1.25rem;
+  padding: 2rem 1.25rem 1.5rem;
   flex-shrink: 0;
+  position: relative;
 }
 
+/* Ambient glow at the top of sidebar */
+.organizer-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(167, 139, 250, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Sidebar Header ── */
 .sidebar-header {
-  margin-bottom: 2rem;
+  margin-bottom: 2.25rem;
+  position: relative;
 }
 
 .sidebar-header h3 {
-  color: #fff;
+  color: var(--org-text-primary);
   margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .sidebar-subtitle {
-  color: rgba(255, 255, 255, 0.35);
-  font-size: 0.75rem;
-  margin: 0.35rem 0 0;
-  letter-spacing: 0.04em;
+  color: var(--org-text-tertiary);
+  font-size: 0.68rem;
+  margin: 0.4rem 0 0;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  font-weight: 500;
 }
 
 /* ── Nav Links ── */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 2px;
   flex-grow: 1;
 }
 
 .sidebar-nav a {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  color: rgba(255, 255, 255, 0.55);
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  color: var(--org-text-secondary);
   text-decoration: none;
-  border-radius: 10px;
+  border-radius: 8px;
   transition: all 0.2s ease;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  position: relative;
+}
+
+.sidebar-nav a .nav-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.5;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
 }
 
 .sidebar-nav a:hover {
-  background: rgba(124, 58, 237, 0.08);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--org-accent-muted);
+  color: var(--org-text-primary);
 }
 
+.sidebar-nav a:hover .nav-icon {
+  opacity: 0.8;
+}
+
+/* Active state with VU-meter glow line */
 .sidebar-nav a.active {
-  background: var(--org-primary-dim);
-  color: #fff;
+  background: rgba(167, 139, 250, 0.1);
+  color: var(--org-text-primary);
   font-weight: 600;
 }
 
-/* ── Footer ── */
+.sidebar-nav a.active .nav-icon {
+  opacity: 1;
+  color: var(--org-accent);
+}
+
+.sidebar-nav a.active::before {
+  content: '';
+  position: absolute;
+  left: -1.25rem;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: linear-gradient(180deg, var(--org-accent), #8b5cf6);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.5);
+  animation: vuPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes vuPulse {
+  0%, 100% { opacity: 0.7; box-shadow: 0 0 8px rgba(167, 139, 250, 0.3); }
+  50% { opacity: 1; box-shadow: 0 0 16px rgba(167, 139, 250, 0.6); }
+}
+
+/* ── Sidebar Footer ── */
 .sidebar-footer {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(124, 58, 237, 0.1);
+  border-top: 1px solid var(--org-border);
 }
 
 .create-btn {
   width: 100%;
   text-align: center;
   padding: 0.75rem;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   border-radius: 10px;
-  background: var(--org-primary);
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
   color: #fff;
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+  font-size: 0.88rem;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 .create-btn:hover {
-  box-shadow: 0 4px 16px var(--org-primary-glow);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);
   transform: translateY(-1px);
+  border-color: rgba(167, 139, 250, 0.5);
 }
 
-/* ── Content ── */
+.create-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Content Area ── */
 .organizer-content {
   flex: 1;
   padding: 2rem 2.5rem;
   overflow-y: auto;
   max-height: calc(100vh - 70px);
+  background: var(--org-surface);
+}
+
+/* Scoped scrollbar for organizer */
+.organizer-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.organizer-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.organizer-content::-webkit-scrollbar-thumb {
+  background: rgba(167, 139, 250, 0.2);
+  border-radius: 3px;
+}
+
+.organizer-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(167, 139, 250, 0.35);
 }
 
 /* ── Responsive ── */
@@ -125,9 +223,13 @@
   .organizer-sidebar {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid rgba(124, 58, 237, 0.1);
-    padding: 1rem;
+    border-bottom: 1px solid var(--org-border);
+    padding: 1rem 1.25rem;
     align-items: center;
+  }
+
+  .organizer-sidebar::before {
+    display: none;
   }
 
   .sidebar-header {
@@ -140,12 +242,29 @@
     overflow-x: auto;
     width: 100%;
     justify-content: center;
+    gap: 4px;
   }
   
   .sidebar-nav a {
     white-space: nowrap;
     padding: 0.6rem 1rem;
     font-size: 0.85rem;
+  }
+
+  .sidebar-nav a.active::before {
+    display: none;
+  }
+
+  .sidebar-nav a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--org-accent);
+    box-shadow: 0 0 8px rgba(167, 139, 250, 0.4);
   }
 
   .sidebar-footer {
@@ -157,5 +276,40 @@
   
   .organizer-content {
     padding: 1.5rem 1rem;
+    max-height: none;
   }
+}
+
+/* ── Scoped Overrides for Organizer Context ── */
+.organizer-layout .btn-primary {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: #fff;
+}
+
+.organizer-layout .btn-primary:hover {
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+}
+
+.organizer-layout .btn-primary:disabled {
+  background: rgba(167, 139, 250, 0.15);
+  color: rgba(255, 255, 255, 0.35);
+  box-shadow: none;
+}
+
+.organizer-layout .glass-card {
+  background: var(--org-surface-raised);
+  border: 1px solid var(--org-border);
+}
+
+.organizer-layout .glass-card:hover {
+  border-color: var(--org-border-hover);
+}
+
+/* Lucide spinner utility */
+.organizer-layout .animate-spin {
+  animation: spinRotate 0.7s linear infinite;
+}
+
+@keyframes spinRotate {
+  to { transform: rotate(360deg); }
 }

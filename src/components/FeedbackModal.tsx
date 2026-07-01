@@ -166,7 +166,7 @@ export default function FeedbackModal() {
               {error && <div className="form-error">{error}</div>}
 
               <div className="feedback-actions">
-                <button type="button" className="btn-secondary" onClick={handleDismiss} disabled={submitting}>
+                <button type="button" className="btn-secondary" style={{ background: 'var(--primary)', color: '#fff' }} onClick={handleDismiss} disabled={submitting}>
                   Agora não
                 </button>
                 <button type="submit" className="btn-primary" disabled={submitting || rating === 0}>

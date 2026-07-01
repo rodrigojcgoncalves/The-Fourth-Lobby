@@ -39,6 +39,7 @@ build
 .env.development.local
 .env.test.local
 .env.production.local
+backend/.env
 
 # Editor
 .vscode/
@@ -49,6 +50,17 @@ build
 *.sln
 *.sw?
 
-# Project specific
-_old_prototype/
+# AI Tools
 .ai_memory.json
+.claudecode/
+.agents/
+
+# Project specific - não entra no repositório
+_old_prototype/
+projeto entregar/
+backend/setup_feedback.js
+backend/test_db.js
+Relatório_projeto_rodrigo_51823.pdf
+QUICK_START.txt
+START_NOW.txt
+Validação_de_tokens.png
