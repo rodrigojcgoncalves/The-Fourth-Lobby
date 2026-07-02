@@ -1,6 +1,6 @@
 # The Fourth Lobby
 
-Sistema B2B ("White-Label") de bilhética e gestão de eventos de música eletrónica, desenhado nativamente para ser a plataforma exclusiva da label **Fourth Dimension**. O sistema suporta o ciclo completo de um evento — desde a gestão de RPs/Promotores e a venda de bilhetes com descontos de afiliados, até ao check-in de participantes (QR Code) e controlo financeiro.
+Sistema B2B ("White-Label") de bilhética e gestão de eventos de música eletrónica, desenhado nativamente para ser a plataforma exclusiva da label **Fourth Dimension**. O sistema suporta o ciclo completo de um evento, desde a gestão de RPs/Promotores e a venda de bilhetes com descontos de afiliados, até ao check-in de participantes (QR Code) e controlo financeiro.
 
 ---
 
@@ -167,8 +167,8 @@ O controlo de acessos é aplicado no backend via middleware. São suportados tr�
 
 As imagens são guardadas no bucket `event-images` do Supabase, organizadas em subpastas:
 
-- `event-images/events/` — capas dos eventos
-- `event-images/artists/` — fotos de perfil dos artistas
+- `event-images/events/` - capas dos eventos
+- `event-images/artists/` - fotos de perfil dos artistas
 
 ---
 
